@@ -1,6 +1,7 @@
 {
   "name": "bitv-audit-tool",
   "version": "1.0.0",
+  "type": "module",
   "description": "A tool for checking BITV compliance of websites",
   "main": "src/main.js",
   "scripts": {

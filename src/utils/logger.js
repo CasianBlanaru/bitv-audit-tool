@@ -1,13 +1,22 @@
-const chalk = require('chalk');
-const logSymbols = require('log-symbols');
+import chalk from 'chalk';
+import logSymbols from 'log-symbols';
 
-const logger = {
-  info: (message) => console.log(chalk.blue(logSymbols.info), chalk.blue(message)),
-  success: (message) => console.log(chalk.green(logSymbols.success), chalk.green(message)),
-  warning: (message) => console.log(chalk.yellow(logSymbols.warning), chalk.yellow(message)),
-  error: (message) => console.log(chalk.red(logSymbols.error), chalk.red(message)),
-  waiting: (message) => console.log(chalk.cyan('⏳'), chalk.cyan(message)),
-  screenshot: (message) => console.log(chalk.magenta('📸'), chalk.magenta(message))
+const icons = {
+  info: '🔵',
+  success: '✅',
+  warning: '⚠️',
+  error: '❌',
+  waiting: '⏳',
+  screenshot: '📸'
 };
 
-module.exports = logger; 
+const logger = {
+  info: (message) => console.log(icons.info, chalk.blue(message)),
+  success: (message) => console.log(icons.success, chalk.green(message)),
+  warning: (message) => console.log(icons.warning, chalk.yellow(message)),
+  error: (message) => console.log(icons.error, chalk.red(message)),
+  waiting: (message) => console.log(icons.waiting, chalk.cyan(message)),
+  screenshot: (message) => console.log(icons.screenshot, chalk.magenta(message))
+};
+
+export default logger; 

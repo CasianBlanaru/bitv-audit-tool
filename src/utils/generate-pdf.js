@@ -1,13 +1,19 @@
-const puppeteer = require('puppeteer');
-const http = require('node:http');
-const fs = require('node:fs');
-const fsPromises = require('node:fs').promises;
-const path = require('node:path');
-const runChecks = require('./run-checks');
-const logger = require('./logger');
+import puppeteer from 'puppeteer';
+import http from 'node:http';
+import fs from 'node:fs';
+import { promises as fsPromises } from 'node:fs';
+import path from 'node:path';
+import { fileURLToPath } from 'node:url';
+import { dirname } from 'node:path';
+import runChecks from './run-checks.js';
+import logger from './logger.js';
+import dotenv from 'dotenv';
+
+const __filename = fileURLToPath(import.meta.url);
+const __dirname = dirname(__filename);
 
 // Load environment variables
-require('dotenv').config();
+dotenv.config();
 
 // Simple HTTP server to host the website locally
 const server = http.createServer((req, res) => {
