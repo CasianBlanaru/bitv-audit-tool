@@ -1,8 +1,8 @@
 // src/constants.js
 const BITV_CATEGORIES = {
-  WAHRNEHMBAR: 'wahrnehmbar',
-  BEDIENBAR: 'bedienbar',
-  VERSTAENDLICH: 'verstaendlich',
+  PERCEIVABLE: 'perceivable',
+  OPERABLE: 'operable',
+  UNDERSTANDABLE: 'understandable',
   ROBUST: 'robust'
 };
 

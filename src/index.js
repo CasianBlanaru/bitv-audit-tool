@@ -6,24 +6,24 @@ async function runAccessibilityCheck(url) {
     const page = await browser.newPage();
     await page.goto(url);
 
-    // Extrahiere die Farben von der Website
+    // Extract colors from the website
     const extractedColors = await extractColors(page);
-    console.log('Extrahierte Farben:', extractedColors);
+    console.log('Extracted colors:', extractedColors);
 
-    // Führe die Checks durch
+    // Run the checks
     const results = {};
     for (const [checkId, check] of Object.entries(BITV_CHECKS)) {
       results[checkId] = await runCheck(page, check);
     }
 
-    // Generiere den Report mit den extrahierten Farben
+    // Generate report with extracted colors
     const pdfGenerator = new PdfReportGenerator(url, results, extractedColors);
     await pdfGenerator.generate('accessibility-report.pdf');
 
     await browser.close();
     return results;
   } catch (error) {
-    console.error('Fehler beim Ausführen der Barrierefreiheitsprüfung:', error);
+    console.error('Error running accessibility check:', error);
     throw error;
   }
 } 

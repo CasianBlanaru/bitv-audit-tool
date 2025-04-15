@@ -18,13 +18,13 @@ async function runAccessibilityTests(url) {
         const errors = await check.check(page);
         results[checkId] = { errors: errors || [] };
       } catch (e) {
-        console.warn(`Check ${checkId} fehlgeschlagen:`, e.message);
-        results[checkId] = { errors: [{ error: `Check fehlgeschlagen: ${e.message}` }] };
+        console.warn(`Check ${checkId} failed:`, e.message);
+        results[checkId] = { errors: [{ error: `Check failed: ${e.message}` }] };
       }
     }
     return { results, extractedColors };
   } catch (e) {
-    console.error(`Fehler beim Laden der Seite ${url}:`, e.message);
+    console.error(`Error loading page ${url}:`, e.message);
     return { results: {}, extractedColors: {} };
   } finally {
     await browser.close();
@@ -35,7 +35,7 @@ async function generateReport(url, outputDir = './reports') {
   try {
     const { results, extractedColors } = await runAccessibilityTests(url);
     if (!Object.keys(results).length) {
-      console.error('Keine gültigen Testergebnisse verfügbar');
+      console.error('No valid test results available');
       return;
     }
 
@@ -44,9 +44,9 @@ async function generateReport(url, outputDir = './reports') {
     const generator = new PdfReportGenerator(url, results, extractedColors);
     await generator.generate(filename);
 
-    console.log(`PDF-Bericht erstellt: ${filename}`);
+    console.log(`PDF report created: ${filename}`);
   } catch (error) {
-    console.error('Fehler beim Generieren des Berichts:', error.message);
+    console.error('Error generating report:', error.message);
     throw error;
   }
 }
