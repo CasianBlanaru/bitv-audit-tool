@@ -4,6 +4,7 @@ const fs = require('node:fs');
 const fsPromises = require('node:fs').promises;
 const path = require('node:path');
 const runChecks = require('./run-checks');
+const Logger = require('./logger');
 
 // Load environment variables
 require('dotenv').config();
@@ -191,3 +192,9 @@ generatePDF(url).catch((err) => {
   server.close();
   process.exit(1);
 });
+
+// Replace console.log messages with Logger
+Logger.waiting(`Warte auf Element ${selector}...`);
+Logger.error(`Element ${selector} nicht sichtbar innerhalb von ${timeout} Sekunden: ${error.message}`);
+Logger.screenshot(`Fallback-Screenshot für ${selector} erstellt.`);
+Logger.success(`Screenshot für ${selector} erstellt.`);
