@@ -1,10 +1,12 @@
-
 const puppeteer = require('puppeteer');
 const PdfReportGenerator = require('./report/PdfReportGenerator');
 const { BITV_CHECKS } = require('./checks/bitvChecks');
 const { extractColors } = require('./checks/colorExtractor');
 const fs = require('node:fs').promises;
 const path = require('node:path');
+
+// Load environment variables
+require('dotenv').config();
 
 async function runAccessibilityTests(url) {
   const browser = await puppeteer.launch({ headless: 'new' });
@@ -53,9 +55,16 @@ async function generateReport(url, outputDir = './reports') {
 
 module.exports = {
   runAccessibilityTests,
-  generateReport
+  generateReport,
 };
 
 if (require.main === module) {
-  generateReport('https://www.nordwestbahn.de').catch(console.error);
+  const url = process.env.TARGET_URL || 'http://localhost:3000';
+
+  if (!url) {
+    console.error('Error: TARGET_URL is not defined in .env file');
+    process.exit(1);
+  }
+
+  generateReport(url).catch(console.error);
 }

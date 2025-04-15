@@ -10,14 +10,14 @@ function getContrastRatio(color1, color2) {
 function getLuminance(color) {
   const rgb = color.match(/\d+/g)?.map(Number);
   if (!rgb || rgb.length < 3) return 0;
-  const [r, g, b] = rgb.map(c => {
-    c = c / 255;
-    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  const [r, g, b] = rgb.map((c) => {
+    const value = c / 255;
+    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
   });
   return 0.2126 * r + 0.7152 * g + 0.0722 * b;
 }
 
 module.exports = {
   getContrastRatio,
-  getLuminance
+  getLuminance,
 };

@@ -26,4 +26,4 @@ async function runAccessibilityCheck(url) {
     console.error('Error running accessibility check:', error);
     throw error;
   }
-} 
+}

@@ -1,6 +1,6 @@
 # BITV Audit Tool
 
-An automated accessibility testing tool for web applications, specifically designed to check compliance with BITV 2.0 (Barrierefreie-Informationstechnik-Verordnung) and EN 301 549 standards.
+An automated accessibility testing tool for web applications, specifically designed to check compliance with BITV 2.0 (German Barrier-Free Information Technology Ordinance) and EN 301 549 standards.
 
 ## Features
 
@@ -10,7 +10,8 @@ An automated accessibility testing tool for web applications, specifically desig
 - Contrast ratio analysis
 - Structured error categorization
 - Weighted scoring system
-- Multi-language support
+- Multi-language support (English and German)
+- Environment-based configuration
 
 ## Technical Details
 
@@ -20,6 +21,7 @@ An automated accessibility testing tool for web applications, specifically desig
 - Color contrast analysis
 - DOM structure validation
 - ARIA attributes verification
+- Environment variable support
 
 ## Installation
 
@@ -27,17 +29,42 @@ An automated accessibility testing tool for web applications, specifically desig
 yarn install
 ```
 
+## Configuration
+
+1. Create a `.env` file in the root directory (you can copy from `.env.example`):
+```bash
+cp .env.example .env
+```
+
+2. Configure the environment variables:
+```env
+# URL for BITV compliance testing
+TARGET_URL=https://example.com
+
+# Additional configurations
+NODE_ENV=development
+```
+
 ## Usage
 
+There are two ways to run the tool:
+
+1. Using the main script:
 ```bash
-node node src/utils/generate-pdf.js 
+yarn start
+```
+
+2. Using the PDF generator directly:
+```bash
+node src/utils/generate-pdf.js
 ```
 
 The tool will:
-1. Perform accessibility checks
-2. Generate detailed JSON report
-3. Create PDF documentation
-4. Save screenshots of identified issues
+1. Read configuration from `.env` file
+2. Perform accessibility checks on the specified URL
+3. Generate detailed JSON report
+4. Create PDF documentation
+5. Save screenshots of identified issues
 
 ## Output
 
@@ -57,10 +84,43 @@ Checks are organized into four main categories:
 ## Severity Levels
 
 Issues are classified into:
-- Critical
-- High
-- Medium
-- Low
+- Critical: Prevents access for certain user groups
+- High: Significantly impairs accessibility
+- Medium: Moderately affects accessibility
+- Low: Minor accessibility concerns
+
+## Development
+
+### Code Style
+
+The project uses Biome for code formatting and linting. Available commands:
+
+```bash
+# Format code
+yarn format
+
+# Check formatting
+yarn format:check
+
+# Lint code
+yarn lint
+
+# Check and apply fixes
+yarn check
+
+# CI check
+yarn check:ci
+```
+
+## About
+
+Developed by [Pixelcoda](https://pixelcoda.de), a professional web development company specializing in accessibility and web standards.
+
+## Support
+
+For professional support or custom development inquiries, please contact:
+- Website: (https://pixelcoda.de)
+- GitHub: [https://github.com/CasianBlanaru/bitv-audit-tool.git)
 
 ## License
 

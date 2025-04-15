@@ -1,8 +1,32 @@
+# Environment variables
+.env
+
 # Dependencies
 node_modules/
-npm-debug.log
-yarn-debug.log
-yarn-error.log
+
+# Build output
+dist/
+build/
+
+# Logs
+*.log
+npm-debug.log*
+
+# Operating System
+.DS_Store
+Thumbs.db
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Test coverage
+coverage/
+
+# Screenshots
+screenshots/
 
 # Runtime data
 reports/
@@ -11,16 +35,8 @@ screenshots/
 data.json
 
 # Environment
-.env
 .env.local
 .env.*.local
 
-# IDE
-.idea/
-.vscode/
-*.swp
-*.swo
-
-# OS
-.DS_Store
-Thumbs.db
+yarn-debug.log
+yarn-error.log
