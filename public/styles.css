@@ -84,7 +84,7 @@ body {
     margin: 0;
     color: #292D33;
     width: 100%;
-    font-size: var(--font-size-base);
+    font-size: var(--font-size-sm);
 }
 
 /* Section layout */
@@ -636,23 +636,29 @@ h2.accessibility-score-title {
 }
 
 .check-id {
-    color: #0066cc;
-    font-size: 1.2rem;
-    font-weight: 600;
-    margin-right: 1rem;
+    font-weight: bold;
+    color: var(--primary-color);
+    padding: 0.25rem 0.5rem;
+    border-radius: 3px;
+    background-color: rgba(41, 45, 51, 0.1);
 }
 
 .check-title {
     display: flex;
     align-items: center;
-    gap: 8px;
-    margin-bottom: 4px;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    background-color: #f8f9fa;
+    color: var(--primary-color);
+    border-radius: 4px;
+    border: 1px solid var(--border-color);
 }
 
 .check-title h3 {
     margin: 0;
-    font-size: 16px;
-    color: var(--headline-color);
+    font-size: 1.1rem;
+    color: var(--primary-color);
 }
 
 .check-ref {
@@ -1087,7 +1093,7 @@ h2.accessibility-score-title {
 .error-overview-item .check-title h3 {
     font-size: var(--error-title-font-size);
     margin: 0;
-    color: #fff;
+    color: var(--primary-color);
     font-weight: var(--error-title-font-weight);
     line-height: var(--error-title-line-height);
 }

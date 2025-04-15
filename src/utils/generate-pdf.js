@@ -4,7 +4,7 @@ const fs = require('node:fs');
 const fsPromises = require('node:fs').promises;
 const path = require('node:path');
 const runChecks = require('./run-checks');
-const Logger = require('./logger');
+const logger = require('./logger');
 
 // Load environment variables
 require('dotenv').config();
@@ -68,7 +68,7 @@ async function generatePDF(url) {
   const port = 8080;
   await new Promise((resolve, reject) => {
     server.listen(port, () => {
-      console.log(`Server running on http://localhost:${port}`);
+      logger.info(`Server läuft auf http://localhost:${port}`);
       resolve();
     });
     server.on('error', reject);
@@ -85,12 +85,12 @@ async function generatePDF(url) {
     await page.setDefaultNavigationTimeout(180000); // 180 seconds
 
     // Monitor Puppeteer events
-    page.on('console', (msg) => console.log('Browser Log:', msg.text()));
+    page.on('console', (msg) => logger.info('Browser Log:', msg.text()));
 
-    console.log('Loading website...');
+    logger.waiting('Lade Website...');
     await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle0', timeout: 60000 });
 
-    console.log('Waiting for content...');
+    logger.waiting('Warte auf Inhalt...');
     await page.waitForFunction(
       () => {
         const content = document.querySelector('body');
@@ -163,9 +163,9 @@ async function generatePDF(url) {
       preferCSSPageSize: false,
     });
 
-    console.log('PDF has been successfully generated: reports/bitv-report.pdf');
+    logger.success('PDF wurde erfolgreich generiert: reports/bitv-report.pdf');
   } catch (error) {
-    console.error('Error generating PDF:', error);
+    logger.error(`Fehler beim Generieren der PDF: ${error.message}`);
     throw error;
   } finally {
     await browser.close();
@@ -183,18 +183,12 @@ if (!fs.existsSync(reportsDir)) {
 const url = process.env.TARGET_URL || 'http://localhost:3000';
 
 if (!url) {
-  console.error('Error: TARGET_URL is not defined in .env file');
+  logger.error('Fehler: TARGET_URL ist nicht in der .env-Datei definiert');
   process.exit(1);
 }
 
 generatePDF(url).catch((err) => {
-  console.error('Error generating PDF:', err);
+  logger.error(`Fehler beim Generieren der PDF: ${err.message}`);
   server.close();
   process.exit(1);
 });
-
-// Replace console.log messages with Logger
-Logger.waiting(`Warte auf Element ${selector}...`);
-Logger.error(`Element ${selector} nicht sichtbar innerhalb von ${timeout} Sekunden: ${error.message}`);
-Logger.screenshot(`Fallback-Screenshot für ${selector} erstellt.`);
-Logger.success(`Screenshot für ${selector} erstellt.`);

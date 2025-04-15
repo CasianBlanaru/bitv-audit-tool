@@ -1,10 +1,8 @@
 # BITV Audit Tool
 
 <div align="center" style="padding-bottom: 2rem;">
-  <img src="assets/images/bitv-audit-tool-banner.png" alt="BITV Audit Tool Banner - Barrierefreiheit Prüfwerkzeug mit Accessibility Icons und Interface Darstellung" width="100%">
+  <img src="public/bitv-audit-tool-banner.png" alt="BITV Audit Tool Banner - Barrierefreiheit Prüfwerkzeug mit Accessibility Icons und Interface Darstellung" width="100%">
 </div>
-
-
 
 An automated accessibility testing tool for web applications, specifically designed to check compliance with BITV 2.0 (German Barrier-Free Information Technology Ordinance) and EN 301 549 standards.
 
