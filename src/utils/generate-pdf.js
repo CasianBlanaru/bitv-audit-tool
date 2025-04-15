@@ -8,7 +8,7 @@ const runChecks = require('./run-checks');
 // Simple HTTP server to host the website locally
 const server = http.createServer((req, res) => {
     // Special handling for data.json
-    if (req.url === '/data.json') {
+    if (req.url === './data/data.json') {
         const dataPath = path.join(process.cwd(), 'src', 'data', 'data.json');
         fsPromises.readFile(dataPath)
             .then((content) => {
@@ -19,7 +19,7 @@ const server = http.createServer((req, res) => {
                 console.error(`Error loading data.json: ${err.message}`);
                 res.writeHead(404);
                 res.end('File not found');
-            });
+            });a
         return;
     }
 

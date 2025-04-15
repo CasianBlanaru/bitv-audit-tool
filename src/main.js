@@ -1,4 +1,4 @@
-// src/main.js
+
 const puppeteer = require('puppeteer');
 const PdfReportGenerator = require('./report/PdfReportGenerator');
 const { BITV_CHECKS } = require('./checks/bitvChecks');

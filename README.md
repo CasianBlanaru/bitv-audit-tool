@@ -24,13 +24,13 @@ An automated accessibility testing tool for web applications, specifically desig
 ## Installation
 
 ```bash
-npm install
+yarn install
 ```
 
 ## Usage
 
 ```bash
-node run-checks.js [URL]
+node node src/utils/generate-pdf.js 
 ```
 
 The tool will:
