@@ -297,56 +297,70 @@ li strong {
 /* Error Details Styles */
 .error-details {
     margin: 1rem 0;
-    padding: 1rem;
+    padding: 1.25rem;
     background: var(--primary-color);
-    border-radius: 4px;
+    border-radius: 8px;
     color: #fff;
     break-inside: avoid;
     page-break-inside: avoid;
+    border-left: 4px solid var(--error-color);
 }
 
-.error-details + .error-details {
-    margin-top: 0.5rem;
+/* Remove nested margins */
+.error-details .error-details {
+    margin: 0;
+    padding: 0;
+    background: none;
+    border-radius: 0;
+    border-left: none;
 }
 
-.error-details .error-message {
+/* Error message styling */
+.error-message {
     display: flex;
     align-items: center;
-    gap: 0.5rem;
-    margin-bottom: 0.5rem;
-    padding: 0.25rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    background: rgba(220, 53, 69, 0.15);
+    border-radius: 6px;
+    margin-bottom: 1rem;
 }
 
-.error-details .error-message iconify-icon {
+.error-message iconify-icon {
     font-size: 1.25rem;
     color: var(--warning-color);
+    flex-shrink: 0;
 }
 
-.error-details .code-example {
-    margin-top: 0.5rem;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.1);
-    border-radius: 4px;
-    font-family: monospace;
-    overflow-x: auto;
+.error-message span {
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+/* Code example styling */
+.code-example {
+    margin-top: 0.75rem;
+    padding: 1rem;
+    background: rgba(0, 0, 0, 0.2);
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.code-example code {
+    display: block;
+    color: #3FD282;
+    font-family: 'Monaco', 'Consolas', monospace;
+    font-size: 0.9rem;
+    line-height: 1.5;
     white-space: pre-wrap;
     word-break: break-word;
 }
 
-.error-details code {
-    display: block;
-    color: #3FD282;
-    font-size: 0.9rem;
-    line-height: 1.4;
-    font-family: monospace;
-}
-
+/* Links within error details */
 .error-details a {
     color: #fff;
     text-decoration: none;
-    opacity: 0.8;
+    opacity: 0.9;
     transition: opacity 0.2s;
 }
 
@@ -354,29 +368,22 @@ li strong {
     opacity: 1;
 }
 
-/* Fix nested error details */
-.error-details .error-details {
-    margin: 0.5rem 0;
-    padding: 0.75rem;
-    background: rgba(255, 255, 255, 0.05);
-    border-left: 2px solid rgba(255, 255, 255, 0.1);
-}
-
 /* Print optimization */
 @media print {
     .error-details {
         background-color: var(--primary-color) !important;
         color: #fff !important;
+        border-color: var(--error-color) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
     
-    .error-details .error-message {
-        background: rgba(255, 255, 255, 0.1) !important;
+    .error-message {
+        background: rgba(220, 53, 69, 0.15) !important;
     }
     
-    .error-details .code-example {
-        background: rgba(255, 255, 255, 0.1) !important;
+    .code-example {
+        background: rgba(0, 0, 0, 0.2) !important;
     }
 }
 
