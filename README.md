@@ -1,6 +1,6 @@
 # BITV Audit Tool
 
-<div align="center" style="margin-bottom: 2rem;">
+<div align="center" style="padding-bottom: 2rem;">
   <img src="assets/images/bitv-audit-tool-banner.png" alt="BITV Audit Tool Banner - Barrierefreiheit Prüfwerkzeug mit Accessibility Icons und Interface Darstellung" width="100%">
 </div>
 
