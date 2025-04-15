@@ -294,96 +294,139 @@ li strong {
     text-align: center;
 }
 
-/* Error Details Styles */
+/* Error display */
 .error-details {
     margin: 1rem 0;
-    padding: 1.25rem;
-    background: var(--primary-color);
-    border-radius: 8px;
+    padding: 1rem;
+    background: #292D33;
+    border-radius: 4px;
+    border-left: 4px solid #dc3545;
     color: #fff;
-    break-inside: avoid;
-    page-break-inside: avoid;
-    border-left: 4px solid var(--error-color);
 }
 
-/* Remove nested margins */
-.error-details .error-details {
-    margin: 0;
-    padding: 0;
-    background: none;
-    border-radius: 0;
-    border-left: none;
+.error-details.color-info {
+    background: #292D33;
+    color: #fff;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border-left: 4px solid #0066cc;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
 }
 
-/* Error message styling */
-.error-message {
+.error-details.color-info div {
+    padding: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: monospace;
+}
+
+/* Wenn es nur ein Element gibt, soll es die volle Breite nutzen */
+.error-details.color-info div:only-child {
+    grid-column: 1 / -1;
+}
+
+/* Für die error-text div immer volle Breite */
+.error-details .error-text {
+    grid-column: 1 / -1;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
+/* Warning messages */
+.error-warning {
     display: flex;
     align-items: center;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: rgba(220, 53, 69, 0.15);
-    border-radius: 6px;
-    margin-bottom: 1rem;
-}
-
-.error-message iconify-icon {
-    font-size: 1.25rem;
-    color: var(--warning-color);
-    flex-shrink: 0;
-}
-
-.error-message span {
-    font-weight: 500;
-    line-height: 1.4;
-}
-
-/* Code example styling */
-.code-example {
-    margin-top: 0.75rem;
-    padding: 1rem;
-    background: rgba(0, 0, 0, 0.2);
-    border-radius: 6px;
-    overflow: hidden;
-}
-
-.code-example code {
-    display: block;
-    color: #3FD282;
-    font-family: 'Monaco', 'Consolas', monospace;
-    font-size: 0.9rem;
-    line-height: 1.5;
-    white-space: pre-wrap;
-    word-break: break-word;
-}
-
-/* Links within error details */
-.error-details a {
+    gap: 8px;
+    padding: 8px 12px;
+    background: #292D33;
+    border-left: 4px solid #ffc107;
+    margin-bottom: 8px;
     color: #fff;
-    text-decoration: none;
-    opacity: 0.9;
-    transition: opacity 0.2s;
 }
 
-.error-details a:hover {
-    opacity: 1;
+/* Code examples */
+.code-example, .error-text, .color-info {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
 }
 
 /* Print optimization */
 @media print {
-    .error-details {
-        background-color: var(--primary-color) !important;
+    body {
+        margin: 0;
+        padding: 0;
+    }
+
+    .section:last-child {
+        margin-bottom: 0;
+    }
+
+    .page-footer {
+        position: running(footer);
+    }
+
+    @page {
+        @bottom-center {
+            content: element(footer);
+        }
+    }
+
+    .meta-row .test-date {
+        display: inline-block !important;
+    }
+
+    /* Verhindere leere Seite am Ende */
+    #detaillierte-pruefung {
+        page-break-after: avoid;
+    }
+
+    .category-section:last-child {
+        page-break-after: avoid;
+    }
+
+    .check-item:last-child {
+        page-break-after: avoid;
+    }
+
+    /* Verbessere Seitenumbrüche innerhalb der Prüfungen */
+    .check-item {
+        page-break-inside: avoid;
+    }
+
+    .error-details,
+    .error-details.color-info {
+        background: #292D33 !important;
         color: #fff !important;
-        border-color: var(--error-color) !important;
         -webkit-print-color-adjust: exact;
         print-color-adjust: exact;
     }
-    
-    .error-message {
-        background: rgba(220, 53, 69, 0.15) !important;
+
+    /* Entferne zusätzlichen Platz am Ende */
+    body {
+        margin-bottom: 0;
+        padding-bottom: 0;
     }
-    
-    .code-example {
-        background: rgba(0, 0, 0, 0.2) !important;
+
+    .karten-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        width: 100%;
+        page-break-inside: avoid;
+    }
+
+    .karte {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -513,70 +556,123 @@ h2.accessibility-score-title {
 }
 
 .check-list {
-    display: flex;
-    flex-direction: column;
+    display: grid;
     gap: 1.5rem;
-    margin: 2rem 0;
 }
 
 .check-item {
     background: #fff;
     border-radius: 8px;
-    padding: 1.5rem;
-    border: 1px solid var(--border-color);
-    break-inside: avoid;
+    padding: 16px;
+    margin-bottom: 12px;
+    border-left: 4px solid #dc3545;
+    page-break-inside: avoid;
 }
 
-.check-item.has-error {
-    border-left: 4px solid var(--error-color);
+.check-id {
+    color: #0066cc;
+    font-size: 1.2rem;
+    font-weight: 600;
+    margin-right: 1rem;
 }
 
-.check-item .check-title {
+.check-title {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    margin-bottom: 0.5rem;
+    gap: 8px;
+    margin-bottom: 4px;
 }
 
-.check-item .check-id {
-    font-weight: 600;
-    color: var(--accent-color);
-    min-width: 60px;
-}
-
-.check-item h3 {
+.check-title h3 {
     margin: 0;
-    font-size: 1.1rem;
-    color: var(--primary-color);
+    font-size: 16px;
+    color: var(--headline-color);
 }
 
-.check-item .check-ref {
-    color: var(--secondary-color);
-    font-size: 0.9rem;
-    margin-bottom: 1rem;
+.check-ref {
+    font-size: 14px;
+    color: #666;
+    margin-bottom: 8px;
 }
 
 .check-status {
     display: flex;
     align-items: center;
     gap: 0.5rem;
-    padding: 0.5rem;
-    border-radius: 4px;
     margin: 1rem 0;
 }
 
-.check-status.passed {
-    background-color: rgba(40, 167, 69, 0.1);
-    color: #155724;
-}
-
 .check-status.failed {
-    background-color: rgba(220, 53, 69, 0.1);
-    color: #721c24;
+    color: #dc3545;
 }
 
 .check-status iconify-icon {
-    font-size: 1.25rem;
+    font-size: 1.5rem;
+    color: #dc3545;
+}
+
+.error-text {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+}
+
+.error-text .text-label {
+    color: rgba(255, 255, 255, 0.7);
+    margin-bottom: 0.25rem;
+}
+
+.error-text span {
+    color: #fff;
+    font-family: monospace;
+}
+
+.color-info {
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 4px;
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+    gap: 0.5rem;
+}
+
+.color-info div {
+    color: #fff;
+    font-family: monospace;
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.color-info div::before {
+    content: "▶";
+    color: rgba(255, 255, 255, 0.7);
+}
+
+.error-warning iconify-icon {
+    color: #ffc107;
+    font-size: 20px;
+}
+
+.error-warning span {
+    color: #fff;
+}
+
+.error-details a {
+    color: #0066cc;
+    text-decoration: none;
+    display: block;
+    margin: 1rem 0;
+    padding-left: 4rem;
+}
+
+.error-details hr {
+    border: none;
+    border-top: 1px solid rgba(255,255,255,0.1);
+    margin: 1rem 0;
 }
 
 /* Button Styles */
@@ -899,5 +995,49 @@ h2.accessibility-score-title {
 @media screen and (max-width: 768px) {
     .gauge-container {
         max-width: 100%;
+    }
+
+    .error-details.color-info {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+.error-overview-item .check-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.error-overview-item .check-title .check-id {
+    font-size: 1.25rem;
+    color: #0066cc;
+    font-weight: 600;
+}
+
+.error-overview-item .check-title h3 {
+    font-size: 1.5rem;
+    margin: 0;
+    color: #fff;
+    font-weight: 500;
+    line-height: 1.4;
+}
+
+.error-overview-item .check-ref {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: 0.9rem;
+    margin-bottom: 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .error-overview-item .check-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .error-overview-item .check-title h3 {
+        font-size: 1.25rem;
     }
 }

@@ -261,7 +261,6 @@ function getCategoryIcon(category) {
     };
     return icons[category] || 'mdi:checkbox-marked-circle';
 }
-
 function generateDetailedResults(detailedCategories, data) {
     detailedCategories.innerHTML = '';
     const categories = {};
@@ -313,7 +312,7 @@ function generateDetailedResults(detailedCategories, data) {
                                        </div>
                                        ${error.element ? `
                                            <div class="code-example">
-                                               <code>${error.element}</code>
+                                               <code>${formatCode(error.element)}</code>
                                            </div>
                                        ` : ''}
                                    </div>
@@ -327,7 +326,6 @@ function generateDetailedResults(detailedCategories, data) {
         detailedCategories.appendChild(categoryDiv);
     }
 }
-
 function setTestDate() {
     const testDateElements = document.querySelectorAll('.test-date');
     const now = new Date();

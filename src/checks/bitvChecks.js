@@ -374,7 +374,7 @@ const BITV_CHECKS = {
       await fs.mkdir('screenshots', { recursive: true });
       const colors = await require('./colorExtractor').extractColors(page);
       const results = await page.evaluate(() => {
-        const errors = [];
+      const errors = [];
         const elements = document.querySelectorAll('h1, h2, h3, h4, h5, h6, p, a, label, button, input[type="submit"], input[type="button"]');
         for (const el of elements) {
           const style = window.getComputedStyle(el);

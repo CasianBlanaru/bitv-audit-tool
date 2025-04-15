@@ -11,11 +11,11 @@ async function extractColors(page) {
   const elements = await page.evaluate(() => {
     const results = [];
     const textElements = document.querySelectorAll('*');
-    
+
     for (const el of textElements) {
       // Skip elements without text
       if (!el.textContent.trim()) continue;
-      
+
       const style = window.getComputedStyle(el);
       // Extract color properties
       results.push({
@@ -24,7 +24,7 @@ async function extractColors(page) {
         color: style.color,
         backgroundColor: style.backgroundColor,
         fontSize: Number.parseFloat(style.fontSize),
-        fontWeight: style.fontWeight
+        fontWeight: style.fontWeight,
       });
     }
     return results;
@@ -36,17 +36,17 @@ async function extractColors(page) {
     try {
       const textColor = parseRGBA(el.color);
       const bgColor = parseRGBA(el.backgroundColor);
-      
+
       // Skip elements with invalid or transparent colors
       if (!textColor || !bgColor) continue;
-      
+
       processedColors.push({
         element: el.element,
         text: el.textContent,
         foreground: rgbToString(textColor),
         background: rgbToString(bgColor),
         fontSize: el.fontSize,
-        fontWeight: el.fontWeight
+        fontWeight: el.fontWeight,
       });
     } catch (e) {
       console.warn('Color parsing error:', e.message);
@@ -64,12 +64,12 @@ async function extractColors(page) {
 function parseRGBA(color) {
   const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
   if (!rgbaMatch) return null;
-  
+
   return {
     r: Number.parseInt(rgbaMatch[1], 10),
     g: Number.parseInt(rgbaMatch[2], 10),
     b: Number.parseInt(rgbaMatch[3], 10),
-    a: rgbaMatch[4] ? Number.parseFloat(rgbaMatch[4]) : 1
+    a: rgbaMatch[4] ? Number.parseFloat(rgbaMatch[4]) : 1,
   };
 }
 
@@ -85,5 +85,5 @@ function rgbToString(color) {
 }
 
 module.exports = {
-  extractColors
+  extractColors,
 };
