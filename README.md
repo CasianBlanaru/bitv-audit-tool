@@ -5,7 +5,6 @@
 </div>
 
 
-Ein Tool zur Durchführung von Barrierefreiheitsprüfungen gemäß BITV 2.0 und EN 301 549.
 
 An automated accessibility testing tool for web applications, specifically designed to check compliance with BITV 2.0 (German Barrier-Free Information Technology Ordinance) and EN 301 549 standards.
 
