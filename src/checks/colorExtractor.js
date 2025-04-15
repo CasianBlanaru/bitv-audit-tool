@@ -1,59 +1,73 @@
 // src/checks/colorExtractor.js
-const { parse: parseColor } = require('color-parse');
 
 /**
- * Extract colors from a webpage for contrast analysis
+ * Extract colors from a webpage
  * @param {Page} page Puppeteer page object
- * @returns {Promise<Object>} Extracted color information
+ * @returns {Promise<Object>} Extracted colors
  */
-async function extractColors(page) {
-  // Get all elements with text content
-  const elements = await page.evaluate(() => {
-    const results = [];
-    const textElements = document.querySelectorAll('*');
+export async function extractColors(page) {
+  const colors = await page.evaluate(() => {
+    const result = {
+      background: [],
+      text: [],
+      border: [],
+      other: []
+    };
+    
+    function getRGBA(color) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = color;
+      return ctx.fillStyle;
+    }
 
-    for (const el of textElements) {
-      // Skip elements without text
-      if (!el.textContent.trim()) continue;
-
+    const elements = document.querySelectorAll('*');
+    for (const el of elements) {
       const style = window.getComputedStyle(el);
-      // Extract color properties
-      results.push({
+      
+      // Background colors
+      const bgColor = getRGBA(style.backgroundColor);
+      if (bgColor !== 'rgba(0, 0, 0, 0)') {
+        result.background.push({
+          color: bgColor,
+          element: el.tagName.toLowerCase(),
+          context: el.textContent.slice(0, 50)
+        });
+      }
+      
+      // Text colors
+      const textColor = getRGBA(style.color);
+      result.text.push({
+        color: textColor,
         element: el.tagName.toLowerCase(),
-        textContent: el.textContent.trim().slice(0, 50),
-        color: style.color,
-        backgroundColor: style.backgroundColor,
-        fontSize: Number.parseFloat(style.fontSize),
-        fontWeight: style.fontWeight,
+        context: el.textContent.slice(0, 50)
       });
+      
+      // Border colors
+      const borderColor = getRGBA(style.borderColor);
+      if (borderColor !== 'rgba(0, 0, 0, 0)') {
+        result.border.push({
+          color: borderColor,
+          element: el.tagName.toLowerCase(),
+          context: el.textContent.slice(0, 50)
+        });
+      }
+      
+      // Other colors (like outline)
+      const outlineColor = getRGBA(style.outlineColor);
+      if (outlineColor !== 'rgba(0, 0, 0, 0)') {
+        result.other.push({
+          color: outlineColor,
+          element: el.tagName.toLowerCase(),
+          context: el.textContent.slice(0, 50)
+        });
+      }
     }
-    return results;
+    
+    return result;
   });
-
-  // Process and validate colors
-  const processedColors = [];
-  for (const el of elements) {
-    try {
-      const textColor = parseRGBA(el.color);
-      const bgColor = parseRGBA(el.backgroundColor);
-
-      // Skip elements with invalid or transparent colors
-      if (!textColor || !bgColor) continue;
-
-      processedColors.push({
-        element: el.element,
-        text: el.textContent,
-        foreground: rgbToString(textColor),
-        background: rgbToString(bgColor),
-        fontSize: el.fontSize,
-        fontWeight: el.fontWeight,
-      });
-    } catch (e) {
-      console.warn('Color parsing error:', e.message);
-    }
-  }
-
-  return processedColors;
+  
+  return colors;
 }
 
 /**
@@ -84,6 +98,6 @@ function rgbToString(color) {
     : `rgb(${color.r}, ${color.g}, ${color.b})`;
 }
 
-module.exports = {
-  extractColors,
+export default {
+  extractColors
 };

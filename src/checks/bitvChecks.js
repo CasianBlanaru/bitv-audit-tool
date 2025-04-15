@@ -1,9 +1,10 @@
-const { SEVERITY_LEVELS, BITV_CATEGORIES } = require('../constants');
-const fs = require('node:fs').promises;
-const path = require('node:path');
-const { getContrastRatio } = require('../utils/helpers');
+import { SEVERITY_LEVELS, BITV_CATEGORIES } from '../constants.js';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { getContrastRatio } from '../utils/helpers.js';
+import { extractColors } from './colorExtractor.js';
 
-const BITV_CHECKS = {
+export const BITV_CHECKS = {
   '1.1.1': {
     description: 'Non-text Content (Alternative Text)',
     severity: SEVERITY_LEVELS.HIGH,
@@ -421,7 +422,7 @@ const BITV_CHECKS = {
     category: BITV_CATEGORIES.WAHRNEHMBAR,
     check: async (page) => {
       await fs.mkdir('screenshots', { recursive: true });
-      const colors = await require('./colorExtractor').extractColors(page);
+      const colors = await extractColors(page);
       const results = await page.evaluate(() => {
         const errors = [];
         const elements = document.querySelectorAll(
@@ -882,8 +883,8 @@ const BITV_CHECKS = {
           const id = element.getAttribute('id');
           if (id && document.querySelectorAll(`[id="${id}"]`).length > 1) {
             errors.push({
-              element: element.tagName.toLowerCase(),
-              id,
+              element: element.outerHTML.slice(0, 100),
+              selector: element.getAttribute('id') ? `#${element.id}` : element.tagName.toLowerCase(),
               error: `Duplicate ID attribute: ${id}`,
             });
           }
@@ -2452,7 +2453,4 @@ const BITV_CHECK_CATEGORIES = {
   '4.1.2': BITV_CATEGORIES.ROBUST,
 };
 
-module.exports = {
-  BITV_CHECKS,
-  BITV_CHECK_CATEGORIES,
-};
+export default BITV_CHECKS;

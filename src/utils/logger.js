@@ -1,5 +1,4 @@
 import chalk from 'chalk';
-import logSymbols from 'log-symbols';
 
 const icons = {
   info: '🔵',
@@ -10,13 +9,18 @@ const icons = {
   screenshot: '📸'
 };
 
+const formatMessage = (icon, color, ...messages) => {
+  const formattedMessage = messages.join(' ');
+  return `${icon} ${chalk[color](formattedMessage)}`;
+};
+
 const logger = {
-  info: (message) => console.log(icons.info, chalk.blue(message)),
-  success: (message) => console.log(icons.success, chalk.green(message)),
-  warning: (message) => console.log(icons.warning, chalk.yellow(message)),
-  error: (message) => console.log(icons.error, chalk.red(message)),
-  waiting: (message) => console.log(icons.waiting, chalk.cyan(message)),
-  screenshot: (message) => console.log(icons.screenshot, chalk.magenta(message))
+  info: (...args) => console.log(formatMessage(icons.info, 'blue', ...args)),
+  success: (...args) => console.log(formatMessage(icons.success, 'green', ...args)),
+  warning: (...args) => console.log(formatMessage(icons.warning, 'yellow', ...args)),
+  error: (...args) => console.log(formatMessage(icons.error, 'red', ...args)),
+  waiting: (...args) => console.log(formatMessage(icons.waiting, 'cyan', ...args)),
+  screenshot: (...args) => console.log(formatMessage(icons.screenshot, 'magenta', ...args))
 };
 
 export default logger; 

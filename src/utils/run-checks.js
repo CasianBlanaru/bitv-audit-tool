@@ -1,11 +1,12 @@
 // run-checks.js
-const puppeteer = require('puppeteer');
-const fs = require('node:fs').promises;
-const path = require('node:path');
-const { BITV_CHECKS } = require('../checks/bitvChecks');
+import puppeteer from 'puppeteer';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { BITV_CHECKS } from '../checks/bitvChecks.js';
+import dotenv from 'dotenv';
 
 // Load environment variables
-require('dotenv').config();
+dotenv.config();
 
 /**
  * Clean up screenshots directory
@@ -23,7 +24,7 @@ async function cleanupScreenshots() {
   }
 }
 
-async function runChecks(url) {
+export async function runChecks(url) {
   const browser = await puppeteer.launch({ headless: true });
   const page = await browser.newPage();
 
@@ -145,17 +146,4 @@ async function runChecks(url) {
   }
 }
 
-// Get URL from environment variables
-const url = process.env.TARGET_URL || 'http://localhost:3000';
-
-if (!url) {
-  console.error('Error: TARGET_URL is not defined in .env file');
-  process.exit(1);
-}
-
-runChecks(url).catch((err) => {
-  console.error('Error running checks:', err);
-  process.exit(1);
-});
-
-module.exports = runChecks;
+export default runChecks;

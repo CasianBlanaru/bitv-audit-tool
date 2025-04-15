@@ -13,7 +13,7 @@ function createGaugeChart(score) {
       datasets: [
         {
           data: [score, 100 - score],
-          backgroundColor: [score >= 90 ? '#28a745' : score >= 70 ? '#ffc107' : '#dc3545', '#e9ecef'],
+          backgroundColor: ['#034E95', '#E9ECEF'],
           borderWidth: 0,
           circumference: 180,
           rotation: 270,

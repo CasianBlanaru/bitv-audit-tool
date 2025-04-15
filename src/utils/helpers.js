@@ -1,23 +1,47 @@
-// src/utils/helpers.js
-function getContrastRatio(color1, color2) {
-  const luminance1 = getLuminance(color1);
-  const luminance2 = getLuminance(color2);
-  const lighter = Math.max(luminance1, luminance2);
-  const darker = Math.min(luminance1, luminance2);
+/**
+ * Calculate relative luminance of a color
+ * @param {number} r Red component (0-255)
+ * @param {number} g Green component (0-255)
+ * @param {number} b Blue component (0-255)
+ * @returns {number} Relative luminance value
+ */
+function getLuminance(r, g, b) {
+  const [rs, gs, bs] = [r, g, b].map(c => {
+    c = c / 255;
+    return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
+  });
+  return 0.2126 * rs + 0.7152 * gs + 0.0722 * bs;
+}
+
+/**
+ * Parse color string to RGB values
+ * @param {string} color CSS color string
+ * @returns {Object} RGB values
+ */
+function parseColor(color) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  ctx.fillStyle = color;
+  const [r, g, b] = ctx.fillStyle.match(/\d+/g).map(Number);
+  return { r, g, b };
+}
+
+/**
+ * Calculate contrast ratio between two colors
+ * @param {string} color1 First color
+ * @param {string} color2 Second color
+ * @returns {number} Contrast ratio
+ */
+export function getContrastRatio(color1, color2) {
+  const c1 = parseColor(color1);
+  const c2 = parseColor(color2);
+  const l1 = getLuminance(c1.r, c1.g, c1.b);
+  const l2 = getLuminance(c2.r, c2.g, c2.b);
+  const lighter = Math.max(l1, l2);
+  const darker = Math.min(l1, l2);
   return (lighter + 0.05) / (darker + 0.05);
 }
 
-function getLuminance(color) {
-  const rgb = color.match(/\d+/g)?.map(Number);
-  if (!rgb || rgb.length < 3) return 0;
-  const [r, g, b] = rgb.map((c) => {
-    const value = c / 255;
-    return value <= 0.03928 ? value / 12.92 : ((value + 0.055) / 1.055) ** 2.4;
-  });
-  return 0.2126 * r + 0.7152 * g + 0.0722 * b;
-}
-
-module.exports = {
-  getContrastRatio,
-  getLuminance,
+export default {
+  getContrastRatio
 };
