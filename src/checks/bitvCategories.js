@@ -1,5 +1,5 @@
 /**
- * BITV-Kategorien und deren Zuordnungen
+ * BITV categories and their assignments
  */
 
 const { BITV_CATEGORIES } = require('../constants');

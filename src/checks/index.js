@@ -1,4 +1,3 @@
-
 const bitvChecks = require('./bitvChecks');
 const bitvCheckCategories = require('./bitvCategories');
 

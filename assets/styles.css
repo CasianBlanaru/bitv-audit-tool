@@ -1,5 +1,6 @@
 /* Base styles */
 :root {
+    /* Colors */
     --primary-color: #292D33;
     --secondary-color: #666666;
     --accent-color: #0066cc;
@@ -8,6 +9,64 @@
     --success-color: #28a745;
     --warning-color: #ffc107;
     --error-color: #dc3545;
+
+    /* Typography Base */
+    --font-family-base: Arial, sans-serif;
+    --font-family-mono: 'Consolas', 'Monaco', monospace;
+    
+    /* Font Sizes */
+    --font-size-xs: 0.75rem;    /* 12px */
+    --font-size-sm: 0.875rem;   /* 14px */
+    --font-size-base: 1rem;     /* 16px */
+    --font-size-lg: 1.125rem;   /* 18px */
+    --font-size-xl: 1.25rem;    /* 20px */
+    --font-size-2xl: 1.5rem;    /* 24px */
+    --font-size-3xl: 1.875rem;  /* 30px */
+    --font-size-4xl: 2.25rem;   /* 36px */
+    
+    /* Font Weights */
+    --font-weight-normal: 400;
+    --font-weight-medium: 500;
+    --font-weight-semibold: 600;
+    --font-weight-bold: 700;
+    
+    /* Line Heights */
+    --line-height-tight: 1.2;
+    --line-height-normal: 1.4;
+    --line-height-relaxed: 1.6;
+
+    /* Headline Styles */
+    --headline-margin: 0.8em 0 0.5em 0;
+    --headline-color: var(--primary-color);
+    --headline-line-height: var(--line-height-tight);
+
+    /* H1 Styles */
+    --h1-font-size: var(--font-size-4xl);
+    --h1-font-weight: var(--font-weight-bold);
+    --h1-color: var(--headline-color);
+    --h1-line-height: var(--headline-line-height);
+    --h1-margin: var(--headline-margin);
+
+    /* H2 Styles */
+    --h2-font-size: var(--font-size-3xl);
+    --h2-font-weight: var(--font-weight-semibold);
+    --h2-color: var(--headline-color);
+    --h2-line-height: var(--headline-line-height);
+    --h2-margin: var(--headline-margin);
+
+    /* H3 Styles */
+    --h3-font-size: var(--font-size-2xl);
+    --h3-font-weight: var(--font-weight-medium);
+    --h3-color: var(--headline-color);
+    --h3-line-height: var(--headline-line-height);
+    --h3-margin: var(--headline-margin);
+
+    /* Error Headline Styles */
+    --error-title-font-size: var(--font-size-2xl);
+    --error-title-font-weight: var(--font-weight-medium);
+    --error-title-color: #fff;
+    --error-title-line-height: var(--line-height-normal);
+    --error-title-margin: 0;
 }
 
 /* Page setup */
@@ -19,12 +78,13 @@
 
 /* Document structure */
 body {
-    font-family: Arial, sans-serif;
-    line-height: 1.6;
+    font-family: var(--font-family-base);
+    line-height: var(--line-height-normal);
     padding: 0;
     margin: 0;
     color: #292D33;
     width: 100%;
+    font-size: var(--font-size-base);
 }
 
 /* Section layout */
@@ -43,26 +103,32 @@ body {
 
 /* Typography */
 h1, h2, h3 {
-    color: #292D33;
-    margin-top: 0.8em;
-    margin-bottom: 0.5em;
     page-break-after: avoid;
 }
 
 h1 {
-    font-size: 32px;
+    font-size: var(--h1-font-size);
+    font-weight: var(--h1-font-weight);
+    color: var(--h1-color);
+    line-height: var(--h1-line-height);
+    margin: var(--h1-margin);
     text-align: center;
-    margin: 0;
 }
 
 h2 {
-    font-size: 28px;
-    margin-bottom: 1rem;
+    font-size: var(--h2-font-size);
+    font-weight: var(--h2-font-weight);
+    color: var(--h2-color);
+    line-height: var(--h2-line-height);
+    margin: var(--h2-margin);
 }
 
 h3 {
-    font-size: 24px;
-    margin-bottom: 0.8rem;
+    font-size: var(--h3-font-size);
+    font-weight: var(--h3-font-weight);
+    color: var(--h3-color);
+    line-height: var(--h3-line-height);
+    margin: var(--h3-margin);
 }
 
 /* Report header */
@@ -207,20 +273,25 @@ h2.categories-title {
 .karten-container {
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 1rem;
+    gap: 1.5rem;
     margin: 2rem 0;
     page-break-inside: avoid;
+    width: 100%;
 }
 
 .karte {
     background-color: #fff;
     border: 1px solid #e0e0e0;
-    background-color: #fff;
     border-radius: 8px;
     padding: 1.5rem;
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
+    break-inside: avoid;
+    page-break-inside: avoid;
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
 }
 
 .karte strong {
@@ -299,6 +370,38 @@ li strong {
     color: #fff;
 }
 
+.error-details.color-info {
+    background: #292D33;
+    color: #fff;
+    padding: 0.75rem;
+    margin-top: 0.5rem;
+    border-left: 4px solid #0066cc;
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1.5rem;
+}
+
+.error-details.color-info div {
+    padding: 0.25rem 0;
+    color: rgba(255, 255, 255, 0.9);
+    font-family: monospace;
+}
+
+/* Wenn es nur ein Element gibt, soll es die volle Breite nutzen */
+.error-details.color-info div:only-child {
+    grid-column: 1 / -1;
+}
+
+/* Für die error-text div immer volle Breite */
+.error-details .error-text {
+    grid-column: 1 / -1;
+    color: #fff;
+    margin-bottom: 0.5rem;
+    padding: 0.25rem;
+    background: rgba(255, 255, 255, 0.1);
+    border-radius: 2px;
+}
+
 /* Warning messages */
 .error-warning {
     display: flex;
@@ -362,14 +465,34 @@ li strong {
         page-break-inside: avoid;
     }
 
-    .error-details {
-        page-break-inside: avoid;
+    .error-details,
+    .error-details.color-info {
+        background: #292D33 !important;
+        color: #fff !important;
+        -webkit-print-color-adjust: exact;
+        print-color-adjust: exact;
     }
 
     /* Entferne zusätzlichen Platz am Ende */
     body {
         margin-bottom: 0;
         padding-bottom: 0;
+    }
+
+    .karten-container {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+        gap: 1.5rem;
+        width: 100%;
+        page-break-inside: avoid;
+    }
+
+    .karte {
+        break-inside: avoid;
+        page-break-inside: avoid;
+        margin-bottom: 1rem;
+        width: 100%;
+        box-sizing: border-box;
     }
 }
 
@@ -701,9 +824,11 @@ h2.accessibility-score-title {
 }
 
 .error-overview-title h3 {
-    font-size: 1.2rem;
-    margin: 0;
-    font-weight: normal;
+    font-size: var(--error-title-font-size);
+    font-weight: var(--error-title-font-weight);
+    color: var(--error-title-color);
+    line-height: var(--error-title-line-height);
+    margin: var(--error-title-margin);
 }
 
 .no-errors {
@@ -744,8 +869,8 @@ h2.accessibility-score-title {
 
 .error-details code {
     display: block;
-    font-family: 'Consolas', 'Monaco', monospace;
-    font-size: 13px;
+    font-family: var(--font-family-mono);
+    font-size: var(--font-size-base);
     line-height: 1.4;
     color: #3FD282;
     background: #292D33;
@@ -938,5 +1063,71 @@ h2.accessibility-score-title {
 @media screen and (max-width: 768px) {
     .gauge-container {
         max-width: 100%;
+    }
+
+    .error-details.color-info {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+    }
+}
+
+.error-overview-item .check-title {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 0.5rem;
+}
+
+.error-overview-item .check-title .check-id {
+    font-size: var(--font-size-xl);
+    color: var(--accent-color);
+    font-weight: var(--font-weight-semibold);
+}
+
+.error-overview-item .check-title h3 {
+    font-size: var(--error-title-font-size);
+    margin: 0;
+    color: #fff;
+    font-weight: var(--error-title-font-weight);
+    line-height: var(--error-title-line-height);
+}
+
+.error-overview-item .check-ref {
+    color: rgba(255, 255, 255, 0.7);
+    font-size: var(--font-size-sm);
+    margin-bottom: 1.5rem;
+}
+
+@media screen and (max-width: 768px) {
+    .error-overview-item .check-title {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 0.5rem;
+    }
+
+    .error-overview-item .check-title h3 {
+        font-size: var(--error-title-font-size);
+    }
+    
+    h1 {
+        font-size: var(--font-size-3xl);
+    }
+    
+    h2 {
+        font-size: var(--font-size-2xl);
+    }
+    
+    h3 {
+        font-size: var(--font-size-xl);
+    }
+}
+
+@media screen and (max-width: 768px) {
+    :root {
+        /* Mobile Headline Adjustments */
+        --h1-font-size: var(--font-size-3xl);
+        --h2-font-size: var(--font-size-2xl);
+        --h3-font-size: var(--font-size-xl);
+        --error-title-font-size: var(--font-size-xl);
     }
 }

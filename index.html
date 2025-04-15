@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="de">
+<html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -9,13 +9,13 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body> 
-    <!-- Deckblatt -->
+    <!-- Cover Page -->
     <section class="section" id="deckblatt">
         <header class="report-header">
             <img src="assets/logo.svg" alt="Logo" class="logo">
             <div class="report-title">
-                <h1>BITV-Prüfbericht</h1>
-                <div class="subtitle">Barrierefreiheitstest</div>
+                <h1>BITV Audit Report</h1>
+                <div class="subtitle">Accessibility Test</div>
             </div>
             <div class="test-date"></div>
         </header>
@@ -30,11 +30,11 @@
                 <span class="website-url"></span>
             </div>
             <div class="meta-row">
-                <strong>Test nach:</strong>
+                <strong>Test Standard:</strong>
                 <span>BITV 2.0 / EN 301 549</span>
             </div>
             <div class="meta-row">
-                <strong>Konformität mit:</strong>
+                <strong>Conformity with:</strong>
                 <div class="conformity-container">
                     <ul class="conformity-list">
                         <li>BITV 2.0</li>
@@ -43,7 +43,7 @@
                 </div>
             </div>
             <div class="meta-row">
-                <strong>Datum:</strong>
+                <strong>Date:</strong>
                 <span class="test-date"></span>
             </div>
         </div>
@@ -61,7 +61,7 @@
                     </div>
                 </div>
                 <div class="stats-section">
-                    <h2>Kategorien</h2>
+                    <h2>Categories</h2>
                     <div class="chart-container">
                         <canvas id="categoryChart"></canvas>
                     </div>
@@ -69,15 +69,15 @@
             </div>
             <div class="stats-grid">
                 <div class="stat-item">
-                    <span class="stat-label">Gesamtanzahl der Prüfschritte:</span>
+                    <span class="stat-label">Total number of test steps:</span>
                     <span class="stat-value steps"></span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Anzahl der Fehler:</span>
+                    <span class="stat-label">Number of errors:</span>
                     <span class="stat-value errors"></span>
                 </div>
                 <div class="stat-item">
-                    <span class="stat-label">Fehlerhafte Prüfschritte:</span>
+                    <span class="stat-label">Failed test steps:</span>
                     <span class="stat-value failed-steps"></span>
                 </div>
             </div>
@@ -87,11 +87,11 @@
         
     </section>
 
-    <!-- Fehlerübersicht -->
+    <!-- Error Overview -->
     <section class="section" id="fehleruebersicht">
         <div class="section-header">
-            <h2>Fehlerübersicht</h2>
-            <p class="section-description">Identifizierte Barrieren und deren Beschreibung</p>
+            <h2>Error Overview</h2>
+            <p class="section-description">Identified barriers and their description</p>
         </div>
 
         <div id="error-table">
@@ -99,60 +99,125 @@
         </div>
     </section>
 
-    <!-- Detaillierte Prüfung -->
+    <!-- Detailed Review -->
     <section class="section" id="detaillierte-pruefung">
-        <div class="category-section">
-            <div class="category-header">
-                <iconify-icon icon="mdi:eye" class="category-icon"></iconify-icon>
-                <h2>Wahrnehmbar</h2>
-            </div>
-            <div class="check-list">
-                <div class="check-item">
-                    <div class="check-header">
-                        <div class="check-title">
-                            <span class="check-id">1.1.1a</span>
-                            <h3>Alternativtexte für Bedienelemente</h3>
-                        </div>
-                        <div class="check-meta">
-                            <span class="check-ref">BITV 2.0: 1.1.1a | EN 301 549: 1.1.1a</span>
-                        </div>
+        <div class="section-header">
+            <h2>Detailed Review</h2>
+            <p class="section-description">Complete list of all test steps and their results</p>
+            <p>This report was automatically generated and complies with BITV 2.0 and EN 301 549 requirements.</p>
+        </div>
+        
+        <div id="detailed-categories">
+            <!-- Check Item 1: Info and Relationships -->
+            <div class="check-item has-error">
+                <div class="check-title">
+                    <span class="check-id">1.3.1</span>
+                    <h3>Info and Relationships</h3>
+                </div>
+                <div class="check-ref">BITV 2.0: 1.3.1 | EN 301 549: 1.3.1</div>
+                <div class="check-status failed">
+                    <iconify-icon icon="mdi:close-circle"></iconify-icon>
+                    <span>Failed</span>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>No programmatically determinable label</span>
                     </div>
-                    <div class="check-status passed">
-                        <iconify-icon icon="mdi:check-circle" style="color: #28a745;"></iconify-icon>
-                        <span>Bestanden</span>
-                        <span class="check-message">Keine Fehler gefunden</span>
+                    <div class="code-example">
+                        <code><input id="search-input" type="text" placeholder="Enter search term" class="block relative w-full"></code>
                     </div>
                 </div>
-                
-                <div class="check-item has-error">
-                    <div class="check-header">
-                        <div class="check-title">
-                            <span class="check-id">1.3.1a</span>
-                            <h3>HTML-Strukturelemente für Überschriften</h3>
-                        </div>
-                        <div class="check-meta">
-                            <span class="check-ref">BITV 2.0: 1.3.1a | EN 301 549: 1.3.1a</span>
-                        </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>No programmatically determinable label</span>
                     </div>
-                    <div class="check-status failed">
-                        <iconify-icon icon="mdi:close-circle" style="color: #dc3545;"></iconify-icon>
-                        <span>Nicht bestanden</span>
+                    <div class="code-example">
+                        <code><input type="date" class="block relative disabled:opacity-75 focus:outline-none w-full disabled:cursor-not-allowed"></code>
                     </div>
-                    <div class="error-details">
-                        <div class="error-message">
-                            <iconify-icon icon="mdi:alert" style="color: #ffc107;"></iconify-icon>
-                            <span>Überschriftenebene übersprungen: von H0 zu H2 (1x)</span>
-                        </div>
-                        <div class="code-example">
-                            <pre><code>&lt;h2 id="aktuelle-meldungen" class="headline-2"&gt;Aktuelle Meldungen&lt;/h2&gt;</code></pre>
-                        </div>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>No programmatically determinable label</span>
+                    </div>
+                    <div class="code-example">
+                        <code><input type="time" class="block relative disabled:opacity-75 focus:outline-none w-full disabled:cursor-not-allowed"></code>
                     </div>
                 </div>
             </div>
-            <div class="section-header">
-                <h2>Detaillierte Prüfung</h2>
-                <p class="section-description">Vollständige Auflistung aller Prüfschritte und deren Ergebnisse</p>
-                <p>Dieser Bericht wurde automatisch generiert und entspricht den Anforderungen der BITV 2.0 und EN 301 549.</p>
+
+            <!-- Check Item 2: Info and Relationships (Heading Structure) -->
+            <div class="check-item">
+                <div class="check-title">
+                    <span class="check-id">1.3.1a</span>
+                    <h3>Info and Relationships (Heading Structure)</h3>
+                </div>
+                <div class="check-ref">BITV 2.0: 1.3.1a | EN 301 549: 1.3.1a</div>
+                <div class="check-status passed">
+                    <iconify-icon icon="mdi:check-circle" style="color: #28a745;"></iconify-icon>
+                    <span>Passed</span>
+                    <span class="check-message">No errors found</span>
+                </div>
+            </div>
+
+            <!-- Check Item 3: Contrast (Minimum) -->
+            <div class="check-item has-error">
+                <div class="check-title">
+                    <span class="check-id">1.4.3</span>
+                    <h3>Contrast (Minimum)</h3>
+                </div>
+                <div class="check-ref">BITV 2.0: 1.4.3 | EN 301 549: 1.4.3</div>
+                <div class="check-status failed">
+                    <iconify-icon icon="mdi:close-circle"></iconify-icon>
+                    <span>Failed</span>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>Contrast too low: 4.00 < 4.5</span>
+                    </div>
+                    <div class="code-example">
+                        <code><button type="submit" class="w-full ui-button ui-button--custom ui-button--xl ui-button--disabled"></button></code>
+                    </div>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>Contrast too low: 4.00 < 4.5</span>
+                    </div>
+                    <div class="code-example">
+                        <code><button type="link" class="ui-button ui-button--custom ui-button--xl ui-teaser__button"></button></code>
+                    </div>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>Contrast too low: 4.00 < 4.5</span>
+                    </div>
+                    <div class="code-example">
+                        <code><button type="link" class="ui-button ui-button--custom ui-button--xl ui-teaser__button"></button></code>
+                    </div>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>Contrast too low: 4.00 < 4.5</span>
+                    </div>
+                    <div class="code-example">
+                        <code><button type="link" class="ui-button ui-button--custom ui-button--xl ui-teaser__button"></button></code>
+                    </div>
+                </div>
+                <div class="error-details">
+                    <div class="error-message">
+                        <iconify-icon icon="mdi:alert"></iconify-icon>
+                        <span>Contrast too low: 4.00 < 4.5</span>
+                    </div>
+                    <div class="code-example">
+                        <code><button type="link" class="ui-button ui-button--custom ui-button--xl ui-teaser__button"></button></code>
+                    </div>
+                </div>
             </div>
         </div>
     </section>

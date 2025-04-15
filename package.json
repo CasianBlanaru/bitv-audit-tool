@@ -1,11 +1,16 @@
 {
   "name": "bitv-audit-tool",
   "version": "1.0.0",
-  "description": "Ein Tool zur Überprüfung der BITV-Konformität von Webseiten",
+  "description": "A tool for checking BITV compliance of websites",
   "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "format": "./node_modules/.bin/biome format --write .",
+    "format:check": "./node_modules/.bin/biome format .",
+    "lint": "./node_modules/.bin/biome lint .",
+    "check": "./node_modules/.bin/biome check --apply .",
+    "check:ci": "./node_modules/.bin/biome ci ."
   },
   "keywords": [
     "accessibility",
@@ -13,7 +18,12 @@
     "audit",
     "testing"
   ],
-  "author": "",
+  "author": "Casian Blanaru Pixelcoda (https://pixelcoda.de)",
+  "homepage": "https://pixelcoda.de",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/CasianBlanaru/bitv-audit-tool.git"
+  },
   "license": "MIT",
   "dependencies": {
     "@iconify/iconify": "^3.1.1",
@@ -21,9 +31,11 @@
     "axe-core": "^4.10.3",
     "axios": "^1.8.4",
     "canvas": "^3.1.0",
-    "chart.js": "^4.4.8",
+    "chart.js": "^4.4.9",
     "cheerio": "^1.0.0",
     "chrome-launcher": "^1.1.2",
+    "color-parse": "^2.0.2",
+    "dotenv": "^16.5.0",
     "lighthouse": "^12.5.1",
     "pa11y": "^8.0.0",
     "pdfkit": "^0.17.0",
@@ -33,6 +45,7 @@
     "svg-to-pdfkit": "^0.1.8"
   },
   "devDependencies": {
+    "@biomejs/biome": "1.9.4",
     "eslint": "9.24.0",
     "jest": "^29.7.0"
   }

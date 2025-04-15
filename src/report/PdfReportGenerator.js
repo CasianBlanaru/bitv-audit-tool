@@ -17,18 +17,19 @@ const BITV_CHECKS = {
         for (const img of images) {
           const alt = img.getAttribute('alt') || '';
           const isDecorative = img.hasAttribute('role') && img.getAttribute('role') === 'presentation';
-          const isSuspicious = alt.match(/^(Bild|Grafik|img\d+\.\w+)$/i) || (!isDecorative && (alt.length < 5 || alt.length > 150));
+          const isSuspicious =
+            alt.match(/^(Bild|Grafik|img\d+\.\w+)$/i) || (!isDecorative && (alt.length < 5 || alt.length > 150));
           if (!isDecorative && alt === '') {
             errors.push({
               src: img.src,
               selector: img.getAttribute('id') ? `#${img.id}` : `img[src="${img.src.replace(/"/g, '')}"]`,
-              error: 'Fehlender Alternativtext'
+              error: 'Fehlender Alternativtext',
             });
           } else if (isSuspicious && !isDecorative) {
             errors.push({
               src: img.src,
               selector: img.getAttribute('id') ? `#${img.id}` : `img[src="${img.src.replace(/"/g, '')}"]`,
-              error: `Verdächtiger Alternativtext: "${alt}"`
+              error: `Verdächtiger Alternativtext: "${alt}"`,
             });
           }
         }
@@ -49,9 +50,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            // Überprüfe, ob die BoundingBox gültige Werte hat
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -62,14 +70,16 @@ const BITV_CHECKS = {
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
           } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
+    },
   },
   // Die folgenden Prüfungen (1.2.3, 1.2.5, 1.3.1, etc.) müssen ähnlich angepasst werden
   '1.2.3': {
@@ -87,13 +97,13 @@ const BITV_CHECKS = {
             errors.push({
               src: video.currentSrc,
               selector: video.getAttribute('id') ? `#${video.id}` : 'video',
-              error: 'Keine Audiodeskription oder Untertitel gefunden'
+              error: 'Keine Audiodeskription oder Untertitel gefunden',
             });
           }
         }
         return errors;
       });
-    }
+    },
   },
   '1.2.5': {
     description: 'Audiodeskription (vorgefertigt)',
@@ -106,7 +116,7 @@ const BITV_CHECKS = {
         const videos = document.querySelectorAll('video');
         for (const video of videos) {
           const tracks = video.querySelectorAll('track[kind="descriptions"]');
-          const trackUrls = Array.from(tracks).map(t => t.src);
+          const trackUrls = Array.from(tracks).map((t) => t.src);
           const validTracks = [];
           for (const url of trackUrls) {
             try {
@@ -120,13 +130,13 @@ const BITV_CHECKS = {
             errors.push({
               src: video.currentSrc,
               selector: video.getAttribute('id') ? `#${video.id}` : 'video',
-              error: 'Ungültige oder fehlende Audiodeskription'
+              error: 'Ungültige oder fehlende Audiodeskription',
             });
           }
         }
         return errors;
       });
-    }
+    },
   },
   '1.3.1': {
     description: 'Info und Beziehungen',
@@ -139,12 +149,13 @@ const BITV_CHECKS = {
         const formElements = document.querySelectorAll('input, select, textarea');
         for (const element of formElements) {
           if (element.type === 'hidden') continue;
-          const hasLabel = element.labels?.length > 0 || element.getAttribute('aria-label') || element.getAttribute('aria-labelledby');
+          const hasLabel =
+            element.labels?.length > 0 || element.getAttribute('aria-label') || element.getAttribute('aria-labelledby');
           if (!hasLabel) {
             errors.push({
               element: element.outerHTML.slice(0, 100),
               selector: element.getAttribute('id') ? `#${element.id}` : element.tagName.toLowerCase(),
-              error: 'Keine programmatisch ermittelbare Beschriftung'
+              error: 'Keine programmatisch ermittelbare Beschriftung',
             });
           }
         }
@@ -156,7 +167,7 @@ const BITV_CHECKS = {
             errors.push({
               element: heading.outerHTML.slice(0, 100),
               selector: heading.getAttribute('id') ? `#${heading.id}` : heading.tagName.toLowerCase(),
-              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`
+              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`,
             });
           }
           lastLevel = level;
@@ -178,10 +189,18 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
-        return null;
-      }
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
+              return null;
+            }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
           }, error.selector);
 
@@ -189,15 +208,17 @@ const BITV_CHECKS = {
             const filename = `error_1.3.1_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
-    } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+          } else {
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
+    },
   },
   '1.3.1a': {
     description: 'Info und Beziehungen (Überschriftenstruktur)',
@@ -215,7 +236,7 @@ const BITV_CHECKS = {
             errors.push({
               element: heading.outerHTML.slice(0, 100),
               selector: heading.getAttribute('id') ? `#${heading.id}` : heading.tagName.toLowerCase(),
-              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`
+              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`,
             });
           }
           lastLevel = level;
@@ -237,8 +258,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -248,15 +277,17 @@ const BITV_CHECKS = {
             const filename = `error_1.3.1a_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
-      } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+          } else {
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
+    },
   },
   '1.4.3': {
     description: 'Kontrast (Minimum)',
@@ -279,7 +310,7 @@ const BITV_CHECKS = {
               selector: el.getAttribute('id') ? `#${el.id}` : el.tagName.toLowerCase(),
               text,
               fgColor,
-              bgColor
+              bgColor,
             });
           }
         }
@@ -294,10 +325,13 @@ const BITV_CHECKS = {
             const el = document.querySelector(sel);
             return el ? Number.parseFloat(window.getComputedStyle(el).fontSize) : 16;
           }, item.selector);
-          const isLarge = fontSize >= 18 || (fontSize >= 14 && await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            return el ? Number.parseFloat(window.getComputedStyle(el).fontWeight) >= 700 : false;
-          }, item.selector));
+          const isLarge =
+            fontSize >= 18 ||
+            (fontSize >= 14 &&
+              (await page.evaluate((sel) => {
+                const el = document.querySelector(sel);
+                return el ? Number.parseFloat(window.getComputedStyle(el).fontWeight) >= 700 : false;
+              }, item.selector)));
           const required = isLarge ? 3 : 4.5;
           if (contrastRatio < required) {
             errors.push({
@@ -306,7 +340,7 @@ const BITV_CHECKS = {
               selector: item.selector,
               error: `Kontrast zu niedrig: ${contrastRatio.toFixed(2)} < ${required}`,
               fgColor: item.fgColor,
-              bgColor: item.bgColor
+              bgColor: item.bgColor,
             });
           }
         } catch (e) {
@@ -314,7 +348,7 @@ const BITV_CHECKS = {
         }
       }
 
-    for (const error of errors) {
+      for (const error of errors) {
         try {
           const boundingBox = await page.evaluate((sel) => {
             const el = document.querySelector(sel);
@@ -328,8 +362,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -340,14 +382,16 @@ const BITV_CHECKS = {
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
           } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return errors;
-    }
+    },
   },
   '2.2.2': {
     description: 'Pausieren, Stoppen, Ausblenden',
@@ -359,13 +403,14 @@ const BITV_CHECKS = {
         const errors = [];
         const movingElements = document.querySelectorAll('[style*="animation"], [style*="transition"], marquee');
         for (const element of movingElements) {
-          const hasPause = element.querySelector('button[aria-label*="pause"], button[aria-label*="stop"]') ||
-                           element.hasAttribute('aria-controls');
+          const hasPause =
+            element.querySelector('button[aria-label*="pause"], button[aria-label*="stop"]') ||
+            element.hasAttribute('aria-controls');
           if (!hasPause) {
             errors.push({
               element: element.outerHTML.slice(0, 100),
               selector: element.getAttribute('id') ? `#${element.id}` : element.tagName.toLowerCase(),
-              error: 'Kein Mechanismus zum Pausieren oder Stoppen'
+              error: 'Kein Mechanismus zum Pausieren oder Stoppen',
             });
           }
         }
@@ -386,8 +431,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -398,14 +451,16 @@ const BITV_CHECKS = {
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
           } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
+    },
   },
   '2.4.4': {
     description: 'Linkzweck (im Kontext)',
@@ -427,7 +482,7 @@ const BITV_CHECKS = {
               text,
               href: link.href,
               selector: link.getAttribute('id') ? `#${link.id}` : `a[href="${link.href.replace(/"/g, '')}"]`,
-              error: 'Generischer Link ohne klaren Kontext'
+              error: 'Generischer Link ohne klaren Kontext',
             });
           }
         }
@@ -448,8 +503,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -460,14 +523,16 @@ const BITV_CHECKS = {
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
           } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
         } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
+    },
   },
   '2.4.5': {
     description: 'Mehrere Wege',
@@ -481,14 +546,16 @@ const BITV_CHECKS = {
         if (document.querySelector('form[role="search"], input[type="search"]')) navigationMethods.push('Suche');
         if (document.querySelector('a[href$="sitemap"], a[href$="site-map"]')) navigationMethods.push('Sitemap');
         if (navigationMethods.length < 2) {
-          return [{
-            error: `Weniger als zwei Navigationswege gefunden: ${navigationMethods.join(', ') || 'keine'}`
-          }];
+          return [
+            {
+              error: `Weniger als zwei Navigationswege gefunden: ${navigationMethods.join(', ') || 'keine'}`,
+            },
+          ];
         }
         return [];
       });
       return results;
-    }
+    },
   },
   '3.1.3': {
     description: 'Ungewöhnliche Wörter',
@@ -497,15 +564,16 @@ const BITV_CHECKS = {
     check: async (page) => {
       await fs.mkdir('screenshots', { recursive: true });
       const results = await page.evaluate(() => {
-        const hasGlossary = document.querySelector('a[href*="glossary"], a[href*="glossar"]') ||
-                            document.querySelector('[id*="glossary"], [id*="glossar"]');
+        const hasGlossary =
+          document.querySelector('a[href*="glossary"], a[href*="glossar"]') ||
+          document.querySelector('[id*="glossary"], [id*="glossar"]');
         if (!hasGlossary) {
           return [{ error: 'Kein Glossar oder Begriffserklärungen gefunden' }];
         }
         return [];
       });
       return results;
-    }
+    },
   },
   '3.2.4': {
     description: 'Konsistente Bezeichnung',
@@ -530,14 +598,14 @@ const BITV_CHECKS = {
             errors.push({
               text,
               hrefs: uniqueHrefs,
-              error: `Inkonsistente Bezeichnung: "${text}" führt zu mehreren Zielen`
+              error: `Inkonsistente Bezeichnung: "${text}" führt zu mehreren Zielen`,
             });
           }
         }
         return errors;
       });
       return results;
-    }
+    },
   },
   '4.1.1': {
     description: 'Parsen',
@@ -554,7 +622,7 @@ const BITV_CHECKS = {
             errors.push({
               element: element.tagName.toLowerCase(),
               id,
-              error: `Dupliziertes ID-Attribut: ${id}`
+              error: `Dupliziertes ID-Attribut: ${id}`,
             });
           }
         }
@@ -565,7 +633,7 @@ const BITV_CHECKS = {
             errors.push({
               element: button.outerHTML.slice(0, 100),
               selector: button.getAttribute('id') ? `#${button.id}` : 'button',
-              error: 'Ungültige Kindelemente in Button'
+              error: 'Ungültige Kindelemente in Button',
             });
           }
         }
@@ -586,8 +654,16 @@ const BITV_CHECKS = {
               return null;
             }
             const rect = el.getBoundingClientRect();
-            if (rect.width <= 0 || rect.height <= 0 || isNaN(rect.x) || isNaN(rect.y) || isNaN(rect.width) || isNaN(rect.height)) {
-              console.log(`Ungültige BoundingBox für ${sel}:`, rect);
+            if (
+              !rect ||
+              rect.width <= 0 ||
+              rect.height <= 0 ||
+              Number.isNaN(rect.x) ||
+              Number.isNaN(rect.y) ||
+              Number.isNaN(rect.width) ||
+              Number.isNaN(rect.height)
+            ) {
+              console.log(`Invalid BoundingBox for ${sel}:`, rect);
               return null;
             }
             return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
@@ -598,15 +674,17 @@ const BITV_CHECKS = {
             await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
             error.screenshot = `screenshots/${filename}`;
           } else {
-            console.log(`Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`);
+            console.log(
+              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
+            );
           }
-    } catch (e) {
+        } catch (e) {
           console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
         }
       }
       return results;
-    }
-  }
+    },
+  },
 };
 
 const BITV_CHECK_CATEGORIES = {
@@ -621,10 +699,10 @@ const BITV_CHECK_CATEGORIES = {
   '2.4.5': BITV_CATEGORIES.BEDIENBAR,
   '3.1.3': BITV_CATEGORIES.VERSTAENDLICH,
   '3.2.4': BITV_CATEGORIES.VERSTAENDLICH,
-  '4.1.1': BITV_CATEGORIES.ROBUST
+  '4.1.1': BITV_CATEGORIES.ROBUST,
 };
 
 module.exports = {
   BITV_CHECKS,
-  BITV_CHECK_CATEGORIES
+  BITV_CHECK_CATEGORIES,
 };
