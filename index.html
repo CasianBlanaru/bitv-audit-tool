@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="stylesheet" href="assets/styles.css">
+    <link rel="icon" href="public/favicon.png" type="image/svg+xml">
+    <script src="https://code.iconify.design/iconify-icon/1.0.7/iconify-icon.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body> 
+    <!-- Deckblatt -->
+    <section class="section" id="deckblatt">
+        <header class="report-header">
+            <img src="assets/logo.svg" alt="Logo" class="logo">
+            <div class="report-title">
+                <h1>BITV-Prüfbericht</h1>
+                <div class="subtitle">Barrierefreiheitstest</div>
+            </div>
+            <div class="test-date"></div>
+        </header>
+
+        <div class="info-box">
+            <div class="meta-row">
+                <strong>Website:</strong>
+                <span class="website-name"></span>
+            </div>
+            <div class="meta-row">
+                <strong>URL:</strong>
+                <span class="website-url"></span>
+            </div>
+            <div class="meta-row">
+                <strong>Test nach:</strong>
+                <span>BITV 2.0 / EN 301 549</span>
+            </div>
+            <div class="meta-row">
+                <strong>Konformität mit:</strong>
+                <div class="conformity-container">
+                    <ul class="conformity-list">
+                        <li>BITV 2.0</li>
+                        <li>EN 301 549 V3.2.1 (2021-03)</li>
+                    </ul>
+                </div>
+            </div>
+            <div class="meta-row">
+                <strong>Datum:</strong>
+                <span class="test-date"></span>
+            </div>
+        </div>
+
+        <div class="summary-box">
+            <div class="summary-grid">
+                <div class="gauge-section">
+                    <h2>Accessibility Score</h2>
+                    <div class="gauge-container">
+                        <canvas id="gaugeChart"></canvas>
+                        <div class="gauge-label">
+                            <span class="score"></span>
+                            <small class="status"></small>
+                        </div>
+                    </div>
+                </div>
+                <div class="stats-section">
+                    <h2>Kategorien</h2>
+                    <div class="chart-container">
+                        <canvas id="categoryChart"></canvas>
+                    </div>
+                </div>
+            </div>
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <span class="stat-label">Gesamtanzahl der Prüfschritte:</span>
+                    <span class="stat-value steps"></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Anzahl der Fehler:</span>
+                    <span class="stat-value errors"></span>
+                </div>
+                <div class="stat-item">
+                    <span class="stat-label">Fehlerhafte Prüfschritte:</span>
+                    <span class="stat-value failed-steps"></span>
+                </div>
+            </div>
+        </div>
+
+        <div class="karten-container" id="category-cards"></div>
+        
+    </section>
+
+    <!-- Fehlerübersicht -->
+    <section class="section" id="fehleruebersicht">
+        <div class="section-header">
+            <h2>Fehlerübersicht</h2>
+            <p class="section-description">Identifizierte Barrieren und deren Beschreibung</p>
+        </div>
+
+        <div id="error-table">
+            <div class="error-list"></div>
+        </div>
+    </section>
+
+    <!-- Detaillierte Prüfung -->
+    <section class="section" id="detaillierte-pruefung">
+        <div class="category-section">
+            <div class="category-header">
+                <iconify-icon icon="mdi:eye" class="category-icon"></iconify-icon>
+                <h2>Wahrnehmbar</h2>
+            </div>
+            <div class="check-list">
+                <div class="check-item">
+                    <div class="check-header">
+                        <div class="check-title">
+                            <span class="check-id">1.1.1a</span>
+                            <h3>Alternativtexte für Bedienelemente</h3>
+                        </div>
+                        <div class="check-meta">
+                            <span class="check-ref">BITV 2.0: 1.1.1a | EN 301 549: 1.1.1a</span>
+                        </div>
+                    </div>
+                    <div class="check-status passed">
+                        <iconify-icon icon="mdi:check-circle" style="color: #28a745;"></iconify-icon>
+                        <span>Bestanden</span>
+                        <span class="check-message">Keine Fehler gefunden</span>
+                    </div>
+                </div>
+                
+                <div class="check-item has-error">
+                    <div class="check-header">
+                        <div class="check-title">
+                            <span class="check-id">1.3.1a</span>
+                            <h3>HTML-Strukturelemente für Überschriften</h3>
+                        </div>
+                        <div class="check-meta">
+                            <span class="check-ref">BITV 2.0: 1.3.1a | EN 301 549: 1.3.1a</span>
+                        </div>
+                    </div>
+                    <div class="check-status failed">
+                        <iconify-icon icon="mdi:close-circle" style="color: #dc3545;"></iconify-icon>
+                        <span>Nicht bestanden</span>
+                    </div>
+                    <div class="error-details">
+                        <div class="error-message">
+                            <iconify-icon icon="mdi:alert" style="color: #ffc107;"></iconify-icon>
+                            <span>Überschriftenebene übersprungen: von H0 zu H2 (1x)</span>
+                        </div>
+                        <div class="code-example">
+                            <pre><code>&lt;h2 id="aktuelle-meldungen" class="headline-2"&gt;Aktuelle Meldungen&lt;/h2&gt;</code></pre>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="section-header">
+                <h2>Detaillierte Prüfung</h2>
+                <p class="section-description">Vollständige Auflistung aller Prüfschritte und deren Ergebnisse</p>
+                <p>Dieser Bericht wurde automatisch generiert und entspricht den Anforderungen der BITV 2.0 und EN 301 549.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="page-footer">
+        <div class="page-number"></div>
+    </footer>
+
+    <script src="assets/script.js"></script>
+</body>
+</html>

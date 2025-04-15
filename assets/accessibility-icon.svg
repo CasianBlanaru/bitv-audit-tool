@@ -1,0 +1,50 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="100" height="100" viewBox="0 0 100 100" role="img" aria-label="Barrierefreiheit Icon" xmlns="http://www.w3.org/2000/svg">
+  <!-- Definitionen für Effekte -->
+  <defs>
+    <filter id="glow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="2" result="blur"/>
+      <feComposite in="SourceGraphic" in2="blur" operator="over"/>
+    </filter>
+  </defs>
+
+  <!-- Beschreibung für Screenreader -->
+  <title>Barrierefreiheit Symbol</title>
+  <desc>Ein stilisiertes Symbol einer Person mit ausgestreckten Armen in einem blauen Kreis, das Inklusion und Barrierefreiheit symbolisiert. Die Person steht aufrecht mit erhobenen, einladenden Armen.</desc>
+  
+  <!-- Hintergrundkreis mit leichtem Gloweffekt -->
+  <circle cx="50" cy="50" r="48" fill="#1a365d" filter="url(#glow)"/>
+  
+  <!-- Menschliches Symbol (weiß) -->
+  <g fill="white" stroke="white" filter="url(#glow)">
+    <!-- Kopf mit leicht größerem Radius für bessere Sichtbarkeit -->
+    <circle cx="50" cy="25" r="11" stroke-width="0"/>
+    
+    <!-- Körper mit weicheren Kanten -->
+    <rect x="42" y="35" width="16" height="25" rx="4" stroke-width="0"/>
+    
+    <!-- Arme (dynamischere Kurven) -->
+    <path d="M42 38 C 32 38, 25 42, 18 48" stroke-width="6" stroke-linecap="round"/>
+    <path d="M58 38 C 68 38, 75 42, 82 48" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Beine (natürlichere Position) -->
+    <path d="M42 60 C 42 70, 38 80, 35 85" stroke-width="6" stroke-linecap="round"/>
+    <path d="M58 60 C 58 70, 62 80, 65 85" stroke-width="6" stroke-linecap="round"/>
+    
+    <!-- Verbindungspunkt zwischen Beinen -->
+    <circle cx="50" cy="60" r="4" stroke-width="0"/>
+  </g>
+
+  <!-- Zusätzliche Metadaten für bessere Maschinenlesbarkeit -->
+  <metadata>
+    <rdf:RDF xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+             xmlns:dc="http://purl.org/dc/elements/1.1/">
+      <rdf:Description>
+        <dc:title>Barrierefreiheit Icon</dc:title>
+        <dc:creator>BITV-Test Checker</dc:creator>
+        <dc:description>Barrierefreiheits-Symbol für den BITV-Test Checker</dc:description>
+        <dc:subject>Barrierefreiheit, Accessibility, Inklusion</dc:subject>
+      </rdf:Description>
+    </rdf:RDF>
+  </metadata>
+</svg> 
