@@ -119,8 +119,8 @@ Developed by [Pixelcoda](https://pixelcoda.de), a professional web development c
 ## Support
 
 For professional support or custom development inquiries, please contact:
-- Website: (https://pixelcoda.de)
-- GitHub: [https://github.com/CasianBlanaru/bitv-audit-tool.git)
+- Website: [https://pixelcoda.de](https://pixelcoda.de)
+- GitHub: [https://github.com/CasianBlanaru/bitv-audit-tool](https://github.com/CasianBlanaru/bitv-audit-tool)
 
 ## License
 
