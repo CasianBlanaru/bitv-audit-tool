@@ -1,7 +1,7 @@
 {
   "name": "bitv-audit-tool",
   "version": "1.0.0",
-  "description": "Ein Tool zur Überprüfung der BITV-Konformität von Webseiten",
+  "description": "A tool for checking BITV compliance of websites",
   "main": "src/main.js",
   "scripts": {
     "start": "node src/main.js",
@@ -24,6 +24,7 @@
     "chart.js": "^4.4.8",
     "cheerio": "^1.0.0",
     "chrome-launcher": "^1.1.2",
+    "color-parse": "^2.0.2",
     "lighthouse": "^12.5.1",
     "pa11y": "^8.0.0",
     "pdfkit": "^0.17.0",
