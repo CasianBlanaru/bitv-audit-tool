@@ -34,11 +34,11 @@ async function extractColors(page) {
   const processedColors = [];
   for (const el of elements) {
     try {
-      const textColor = parseColor(el.color);
-      const bgColor = parseColor(el.backgroundColor);
+      const textColor = parseRGBA(el.color);
+      const bgColor = parseRGBA(el.backgroundColor);
       
       // Skip elements with invalid or transparent colors
-      if (!isValidColor(textColor) || !isValidColor(bgColor)) continue;
+      if (!textColor || !bgColor) continue;
       
       processedColors.push({
         element: el.element,
@@ -57,26 +57,31 @@ async function extractColors(page) {
 }
 
 /**
- * Validate color object
- * @param {Object} color Parsed color object
- * @returns {boolean} Whether the color is valid
+ * Parse RGB/RGBA color string
+ * @param {string} color CSS color string
+ * @returns {Object|null} Color object with r,g,b,a values or null if invalid
  */
-function isValidColor(color) {
-  return color?.values?.length >= 3 && 
-         color.values?.every(v => !Number.isNaN(v)) &&
-         (color.alpha === undefined || !Number.isNaN(color.alpha));
+function parseRGBA(color) {
+  const rgbaMatch = color.match(/rgba?\((\d+),\s*(\d+),\s*(\d+)(?:,\s*([\d.]+))?\)/);
+  if (!rgbaMatch) return null;
+  
+  return {
+    r: Number.parseInt(rgbaMatch[1], 10),
+    g: Number.parseInt(rgbaMatch[2], 10),
+    b: Number.parseInt(rgbaMatch[3], 10),
+    a: rgbaMatch[4] ? Number.parseFloat(rgbaMatch[4]) : 1
+  };
 }
 
 /**
- * Convert RGB color to string representation
- * @param {Object} color Parsed color object
+ * Convert RGB color object to string representation
+ * @param {Object} color RGB(A) color object
  * @returns {string} RGB(A) color string
  */
 function rgbToString(color) {
-  const [r, g, b] = color.values;
-  return color.alpha !== undefined && color.alpha !== 1
-    ? `rgba(${r}, ${g}, ${b}, ${color.alpha})`
-    : `rgb(${r}, ${g}, ${b})`;
+  return color.a !== undefined && color.a !== 1
+    ? `rgba(${color.r}, ${color.g}, ${color.b}, ${color.a})`
+    : `rgb(${color.r}, ${color.g}, ${color.b})`;
 }
 
 module.exports = {
