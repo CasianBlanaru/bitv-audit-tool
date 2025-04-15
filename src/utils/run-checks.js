@@ -4,6 +4,22 @@ const fs = require('node:fs').promises;
 const path = require('node:path');
 const { BITV_CHECKS } = require('../checks/bitvChecks');
 
+/**
+ * Clean up screenshots directory
+ */
+async function cleanupScreenshots() {
+  const screenshotsDir = path.join(process.cwd(), 'screenshots');
+  try {
+    const files = await fs.readdir(screenshotsDir);
+    for (const file of files) {
+      await fs.unlink(path.join(screenshotsDir, file));
+    }
+    console.log('Screenshots cleaned up successfully');
+  } catch (error) {
+    console.warn('Error cleaning up screenshots:', error.message);
+  }
+}
+
 async function runChecks(url) {
     const browser = await puppeteer.launch({ headless: true });
     const page = await browser.newPage();
@@ -110,6 +126,9 @@ async function runChecks(url) {
         const dataPath = path.join(process.cwd(), 'src', 'data', 'data.json');
         await fs.writeFile(dataPath, JSON.stringify(jsonOutput, null, 2));
         console.log('Checks completed, results saved to data.json');
+
+        // Clean up screenshots after saving results
+        await cleanupScreenshots();
 
         return jsonOutput;
     } catch (error) {
