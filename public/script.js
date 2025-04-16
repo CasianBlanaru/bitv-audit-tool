@@ -75,7 +75,7 @@ function createCategoryChart(categories) {
             generateLabels: (chart) => {
               const data = chart.data;
               return data.labels.map((label, i) => ({
-                text: `${label} (${data.datasets[0].data[i]} Fehler)`,
+                text: `${label} (${data.datasets[0].data[i]} errors)`,
                 fillStyle: data.datasets[0].backgroundColor[i],
                 strokeStyle: data.datasets[0].borderColor,
                 lineWidth: data.datasets[0].borderWidth,
@@ -89,7 +89,7 @@ function createCategoryChart(categories) {
             label: (context) => {
               const label = context.label || '';
               const value = context.raw || 0;
-              return `${label}: ${value} Fehler`;
+              return `${label}: ${value} errors`;
             },
           },
         },
@@ -101,7 +101,7 @@ function createCategoryChart(categories) {
 function formatCode(codeString) {
   if (!codeString) return '';
 
-  // Clean the code string
+  // Clean up the code string
   const cleanCode = codeString
     .replace(/&/g, '&amp;')
     .replace(/</g, '&lt;')
@@ -109,7 +109,7 @@ function formatCode(codeString) {
     .replace(/"/g, '&quot;')
     .replace(/'/g, '&#039;');
 
-  // Füge Syntax-Highlighting hinzu
+  // Add syntax highlighting
   return cleanCode
     .replace(/(&lt;[^&]+&gt;)/g, '<span class="code-tag">$1</span>')
     .replace(
@@ -122,7 +122,7 @@ function generateErrorTable(data) {
   const errorList = document.querySelector('#error-table .error-list');
   errorList.innerHTML = '';
 
-  // Gruppiere Fehler nach checkId
+  // Group errors by checkId
   const errorGroups = {};
   for (const [checkId, check] of Object.entries(data.detailedResults)) {
     if (check.errors && check.errors.length > 0) {
@@ -137,58 +137,58 @@ function generateErrorTable(data) {
     }
   }
 
-  // Wenn keine Fehler gefunden wurden
+  // If no errors were found
   if (Object.keys(errorGroups).length === 0) {
     errorList.innerHTML = `
-            <div class="no-errors">
-                <div class="success-message">
-                    <iconify-icon icon="mdi:check-circle"></iconify-icon>
-                    <span>Keine Fehler gefunden</span>
-                </div>
-            </div>
-        `;
+      <div class="no-errors">
+        <div class="success-message">
+          <iconify-icon icon="mdi:check-circle"></iconify-icon>
+          <span>No errors found</span>
+        </div>
+      </div>
+    `;
     return;
   }
 
-  // Generiere Fehlerboxen
+  // Generate error boxes
   for (const group of Object.values(errorGroups)) {
     const errorDiv = document.createElement('div');
     errorDiv.classList.add('error-overview-item');
 
     const baseContent = `
-            <div class="check-title">
-                <span class="check-id">${group.checkId}</span>
-                <h3>${group.description}</h3>
-            </div>
-            <div class="check-ref">BITV 2.0: ${group.checkId} | EN 301 549: ${group.checkId}</div>
-        `;
+      <div class="check-title">
+        <span class="check-id">${group.checkId}</span>
+        <h3>${group.description}</h3>
+      </div>
+      <div class="check-ref">BITV 2.0: ${group.checkId} | EN 301 549: ${group.checkId}</div>
+    `;
 
-    // Fehler-Details
+    // Error details
     const errorDetails = group.errors
       .map((error) => {
         const warning = `
-                <div class="error-warning">
-                    <iconify-icon icon="mdi:alert"></iconify-icon>
-                    <span>${error.error}</span>
-                </div>
-            `;
+          <div class="error-warning">
+            <iconify-icon icon="mdi:alert"></iconify-icon>
+            <span>${error.error}</span>
+          </div>
+        `;
 
         const code = error.element
           ? `
-                <div class="error-details">
-                    <code>${formatCode(error.element)}</code>
-                </div>
-            `
+            <div class="error-details">
+              <code>${formatCode(error.element)}</code>
+            </div>
+          `
           : '';
 
         const colorInfo =
           error.fgColor || error.bgColor
             ? `
-                <div class="error-details color-info">
-                    ${error.text ? `<div class="error-text">${error.text}</div>` : ''}
-                    ${error.fgColor ? `<div>Textfarbe: ${error.fgColor}</div>` : ''}
-                    ${error.bgColor ? `<div>Hintergrundfarbe: ${error.bgColor}</div>` : ''}
-                </div>
+              <div class="error-details color-info">
+                ${error.text ? `<div class="error-text">${error.text}</div>` : ''}
+                ${error.fgColor ? `<div>Text color: ${error.fgColor}</div>` : ''}
+                ${error.bgColor ? `<div>Background color: ${error.bgColor}</div>` : ''}
+              </div>
             `
             : '';
 
@@ -232,7 +232,7 @@ async function loadReportData() {
     if (detailedCategories) {
       generateDetailedResults(detailedCategories, data);
     } else {
-      console.warn('Element "detailed-categories" nicht gefunden');
+      console.warn('Element "detailed-categories" not found in DOM');
     }
 
     // Update category cards
@@ -244,9 +244,9 @@ async function loadReportData() {
         card.className = 'karte';
         card.setAttribute('data-category', cat.name);
         card.innerHTML = `
-                    <strong>${cat.name}</strong>
-                    <span>${cat.errors} Fehler</span>
-                `;
+          <strong>${cat.name}</strong>
+          <span>${cat.errors} errors</span>
+        `;
         categoryCards.appendChild(card);
       }
     }
@@ -257,7 +257,7 @@ async function loadReportData() {
       dateElement.textContent = data.lastUpdated;
     }
   } catch (error) {
-    console.error('Fehler beim Laden der Daten:', error);
+    console.error('Error loading data:', error);
   }
 }
 
@@ -270,11 +270,11 @@ function getCategoryIcon(category) {
   };
   return icons[category] || 'mdi:checkbox-marked-circle';
 }
+
 function generateDetailedResults(detailedCategories, data) {
   detailedCategories.innerHTML = '';
   const categories = {};
 
-  // Gruppiere Prüfungen nach Kategorie
   for (const [checkId, check] of Object.entries(data.detailedResults)) {
     if (!categories[check.category]) {
       categories[check.category] = [];
@@ -285,69 +285,85 @@ function generateDetailedResults(detailedCategories, data) {
     });
   }
 
-  // Erstelle Kategorieabschnitte
   for (const [category, checks] of Object.entries(categories)) {
     const categoryDiv = document.createElement('div');
     categoryDiv.classList.add('category-section');
 
     categoryDiv.innerHTML = `
-            <div class="category-header">
-                <iconify-icon icon="${getCategoryIcon(category)}" class="category-icon"></iconify-icon>
-                <h2>${category}</h2>
-            </div>
-            <div class="check-list">
-                ${checks
-                  .map(
-                    (check) => `
-                    <div class="check-item ${check.errors.length ? 'has-error' : ''}">
-                        <div class="check-title">
-                            <span class="check-id">${check.id}</span>
-                            <h3>${check.description}</h3>
-                        </div>
-                        <div class="check-ref">BITV 2.0: ${check.id} | EN 301 549: ${check.id}</div>
-                        ${
-                          check.errors.length === 0
-                            ? `<div class="check-status passed">
-                                <iconify-icon icon="mdi:check-circle" style="color: #28a745;"></iconify-icon>
-                                <span>Bestanden</span>
-                                <span class="check-message">Keine Fehler gefunden</span>
-                               </div>`
-                            : `<div class="check-status failed">
-                                <iconify-icon icon="mdi:close-circle"></iconify-icon>
-                                <span>Nicht bestanden</span>
-                               </div>
-                               ${check.errors
-                                 .map(
-                                   (error) => `
-                                   <div class="error-details">
-                                       <div class="error-message">
-                                           <iconify-icon icon="mdi:alert"></iconify-icon>
-                                           <span>${error.error}</span>
-                                       </div>
-                                       ${
-                                         error.element
-                                           ? `
-                                           <div class="code-example">
-                                               <code>${formatCode(error.element)}</code>
-                                           </div>
-                                       `
-                                           : ''
-                                       }
-                                   </div>
-                               `
-                                 )
-                                 .join('')}`
-                        }
-                    </div>
-                `
-                  )
-                  .join('')}
-            </div>
-        `;
+      <div class="category-header">
+        <iconify-icon icon="${getCategoryIcon(category)}" class="category-icon"></iconify-icon>
+        <h2>${category}</h2>
+      </div>
+      <div class="check-list">
+        ${checks
+          .map(
+            (check) => `
+              <div class="check-item ${check.errors.length ? 'has-error' : ''}">
+                <div class="check-title">
+                  <span class="check-id">${check.id}</span>
+                  <h3>${check.description}</h3>
+                </div>
+                <div class="check-ref">BITV 2.0: ${check.id} | EN 301 549: ${check.id}</div>
+                <div class="fixable-info">
+                  <span>Automatically fixable: ${check.fixableByWidget ? 'Yes' : 'No'}</span>
+                </div>
+                <div class="fix-suggestion">
+                  <strong>Fix suggestion:</strong> ${check.fixSuggestion || 'No suggestion available'}
+                </div>
+                ${
+                  check.errors.length === 0
+                    ? `<div class="check-status passed">
+                        <iconify-icon icon="mdi:check-circle" style="color: #28a745;"></iconify-icon>
+                        <span>Passed</span>
+                        <span class="check-message">No errors found</span>
+                      </div>`
+                    : `<div class="check-status failed">
+                        <iconify-icon icon="mdi:close-circle"></iconify-icon>
+                        <span>Failed</span>
+                      </div>
+                      ${check.errors
+                        .map(
+                          (error) => `
+                            <div class="error-details">
+                              <div class="error-message">
+                                <iconify-icon icon="mdi:alert"></iconify-icon>
+                                <span>${error.error}</span>
+                              </div>
+                              ${
+                                error.manualCheckRequired
+                                  ? `
+                                    <div class="manual-check">
+                                      <iconify-icon icon="mdi:information"></iconify-icon>
+                                      <span>${error.manualCheckRequired}</span>
+                                    </div>
+                                  `
+                                  : ''
+                              }
+                              ${
+                                error.element
+                                  ? `
+                                    <div class="code-example">
+                                      <code>${formatCode(error.element)}</code>
+                                    </div>
+                                  `
+                                  : ''
+                              }
+                            </div>
+                          `
+                        )
+                        .join('')}`
+                }
+              </div>
+            `
+          )
+          .join('')}
+      </div>
+    `;
 
     detailedCategories.appendChild(categoryDiv);
   }
 }
+
 function setTestDate() {
   const testDateElements = document.querySelectorAll('.test-date');
   const now = new Date();
@@ -365,41 +381,41 @@ function setTestDate() {
 
 async function initializeReport() {
   try {
-    // Warte auf DOM-Elemente
+    // Wait for DOM elements
     const detailedCategories = document.getElementById('detailed-categories');
     const errorTable = document.getElementById('error-table');
     const categoryCards = document.querySelector('.karten-container');
     const gaugeElement = document.getElementById('gaugeChart');
     const categoryChartElement = document.getElementById('categoryChart');
 
-    // Überprüfe notwendige Elemente
+    // Check required elements
     if (!detailedCategories) {
-      console.warn('Element "detailed-categories" nicht im DOM gefunden');
+      console.warn('Element "detailed-categories" not found in DOM');
     }
     if (!errorTable) {
-      console.warn('Element "error-table" nicht im DOM gefunden');
+      console.warn('Element "error-table" not found in DOM');
     }
     if (!categoryCards) {
-      console.warn('Element "karten-container" nicht im DOM gefunden');
+      console.warn('Element "karten-container" not found in DOM');
     }
     if (!gaugeElement) {
-      console.warn('Element "gaugeChart" nicht im DOM gefunden');
+      console.warn('Element "gaugeChart" not found in DOM');
     }
     if (!categoryChartElement) {
-      console.warn('Element "categoryChart" nicht im DOM gefunden');
+      console.warn('Element "categoryChart" not found in DOM');
     }
 
-    // Setze Testdatum
+    // Set test date
     setTestDate();
 
-    // Lade Berichtsdaten
+    // Load report data
     await loadReportData();
   } catch (error) {
-    console.error('Fehler bei der Initialisierung:', error);
+    console.error('Error during initialization:', error);
   }
 }
 
-// Warte auf vollständiges Laden des DOMs
+// Wait for complete DOM loading
 if (document.readyState === 'loading') {
   document.addEventListener('DOMContentLoaded', initializeReport);
 } else {

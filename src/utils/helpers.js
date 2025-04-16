@@ -42,6 +42,27 @@ export function getContrastRatio(color1, color2) {
   return (lighter + 0.05) / (darker + 0.05);
 }
 
+/**
+ * Clean up screenshot files from the screenshots directory
+ * @returns {Promise<void>}
+ */
+export async function cleanupScreenshots() {
+  try {
+    const screenshotsDir = path.join(process.cwd(), 'screenshots');
+    const files = await fs.readdir(screenshotsDir);
+    await Promise.all(
+      files.map(file => fs.unlink(path.join(screenshotsDir, file)))
+    );
+  } catch (error) {
+    console.warn('Error cleaning up screenshots:', error);
+  }
+}
+
+// Add imports at the top
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
+
 export default {
-  getContrastRatio
+  getContrastRatio,
+  cleanupScreenshots
 };
