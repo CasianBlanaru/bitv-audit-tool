@@ -366,6 +366,7 @@ function generateDetailedResults(detailedCategories, data) {
 
 function setTestDate() {
   const testDateElements = document.querySelectorAll('.test-date');
+  const conformityDateElement = document.getElementById('conformity-date');
   const now = new Date();
   const options = {
     day: '2-digit',
@@ -374,8 +375,14 @@ function setTestDate() {
   };
   const formattedDate = now.toLocaleDateString('de-DE', options);
 
+  // Set date in test-date elements
   for (const element of testDateElements) {
     element.textContent = formattedDate;
+  }
+
+  // Set date in conformity list
+  if (conformityDateElement) {
+    conformityDateElement.textContent = `EN 301 549 V3.2.1 (${formattedDate})`;
   }
 }
 

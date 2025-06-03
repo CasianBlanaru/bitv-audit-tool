@@ -11,9 +11,9 @@ export async function extractColors(page) {
       background: [],
       text: [],
       border: [],
-      other: []
+      other: [],
     };
-    
+
     function getRGBA(color) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
@@ -24,49 +24,49 @@ export async function extractColors(page) {
     const elements = document.querySelectorAll('*');
     for (const el of elements) {
       const style = window.getComputedStyle(el);
-      
+
       // Background colors
       const bgColor = getRGBA(style.backgroundColor);
       if (bgColor !== 'rgba(0, 0, 0, 0)') {
         result.background.push({
           color: bgColor,
           element: el.tagName.toLowerCase(),
-          context: el.textContent.slice(0, 50)
+          context: el.textContent.slice(0, 50),
         });
       }
-      
+
       // Text colors
       const textColor = getRGBA(style.color);
       result.text.push({
         color: textColor,
         element: el.tagName.toLowerCase(),
-        context: el.textContent.slice(0, 50)
+        context: el.textContent.slice(0, 50),
       });
-      
+
       // Border colors
       const borderColor = getRGBA(style.borderColor);
       if (borderColor !== 'rgba(0, 0, 0, 0)') {
         result.border.push({
           color: borderColor,
           element: el.tagName.toLowerCase(),
-          context: el.textContent.slice(0, 50)
+          context: el.textContent.slice(0, 50),
         });
       }
-      
+
       // Other colors (like outline)
       const outlineColor = getRGBA(style.outlineColor);
       if (outlineColor !== 'rgba(0, 0, 0, 0)') {
         result.other.push({
           color: outlineColor,
           element: el.tagName.toLowerCase(),
-          context: el.textContent.slice(0, 50)
+          context: el.textContent.slice(0, 50),
         });
       }
     }
-    
+
     return result;
   });
-  
+
   return colors;
 }
 
@@ -99,5 +99,5 @@ function rgbToString(color) {
 }
 
 export default {
-  extractColors
+  extractColors,
 };

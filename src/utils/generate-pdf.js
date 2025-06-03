@@ -18,7 +18,7 @@ dotenv.config();
 // Simple HTTP server to host the website locally
 const server = http.createServer((req, res) => {
   // Special handling for data.json
-  if (req.url === './data/data.json') {
+  if (req.url === '/data.json') {
     const dataPath = path.join(process.cwd(), 'src', 'data', 'data.json');
     fsPromises
       .readFile(dataPath)
@@ -93,10 +93,10 @@ async function generatePDF(url) {
     // Monitor Puppeteer events
     page.on('console', (msg) => logger.info('Browser Log:', msg.text()));
 
-    logger.waiting('Lade Website...');
+    logger.startSpinner('Lade Website...');
     await page.goto(`http://localhost:${port}`, { waitUntil: 'networkidle0', timeout: 60000 });
 
-    logger.waiting('Warte auf Inhalt...');
+    logger.startSpinner('Warte auf Inhalt...');
     await page.waitForFunction(
       () => {
         const content = document.querySelector('body');
@@ -146,7 +146,7 @@ async function generatePDF(url) {
 
     await delay(2000);
 
-    console.log('Generating PDF...');
+    logger.startSpinner('Generiere PDF...');
     await page.pdf({
       path: path.join(process.cwd(), 'reports', 'bitv-report.pdf'),
       format: 'A4',
@@ -169,8 +169,10 @@ async function generatePDF(url) {
       preferCSSPageSize: false,
     });
 
+    logger.stopSpinner();
     logger.success('PDF wurde erfolgreich generiert: reports/bitv-report.pdf');
   } catch (error) {
+    logger.stopSpinner();
     logger.error(`Fehler beim Generieren der PDF: ${error.message}`);
     throw error;
   } finally {
@@ -186,10 +188,10 @@ if (!fs.existsSync(reportsDir)) {
 }
 
 // Generate PDF
-const url = process.env.TARGET_URL || 'http://localhost:3000';
+const url = process.env.TARGET_URL || 'https://www.netinera.de';
 
 if (!url) {
-  logger.error('Fehler: TARGET_URL ist nicht in der .env-Datei definiert');
+  logger.error('Fehler: TARGET_URL ist nicht definiert');
   process.exit(1);
 }
 

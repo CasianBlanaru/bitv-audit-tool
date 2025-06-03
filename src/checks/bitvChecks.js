@@ -21,7 +21,8 @@ export const BITV_CHECKS = {
     severity: SEVERITY_LEVELS.HIGH,
     category: BITV_CATEGORIES.WAHRNEHMBAR,
     fixableByWidget: true, // Automatically fixable (e.g., by adding alt texts)
-    fixSuggestion: 'Add a descriptive `alt` attribute (e.g., `alt="Description of the image"`). For decorative images, set `alt=""` or `role="presentation"`.',
+    fixSuggestion:
+      'Add a descriptive `alt` attribute (e.g., `alt="Description of the image"`). For decorative images, set `alt=""` or `role="presentation"`.',
     check: async (page) => {
       await fs.mkdir('screenshots', { recursive: true });
       const results = await page.evaluate(() => {

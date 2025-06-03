@@ -13,12 +13,7 @@
     "check": "./node_modules/.bin/biome check --apply .",
     "check:ci": "./node_modules/.bin/biome ci ."
   },
-  "keywords": [
-    "accessibility",
-    "BITV",
-    "audit",
-    "testing"
-  ],
+  "keywords": ["accessibility", "BITV", "audit", "testing"],
   "author": "Casian Blanaru Pixelcoda (https://pixelcoda.de)",
   "homepage": "https://pixelcoda.de",
   "repository": {

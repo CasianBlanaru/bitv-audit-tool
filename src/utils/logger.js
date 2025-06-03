@@ -13,7 +13,7 @@ class Logger {
    */
   startSpinner(message) {
     this.stopSpinner(); // Stop any existing spinner
-    
+
     process.stdout.write('\n');
     this.interval = setInterval(() => {
       process.stdout.write('\r' + chalk.cyan(this.spinnerFrames[this.currentFrame]) + ' ' + chalk.white(message));
@@ -83,8 +83,16 @@ class Logger {
   header() {
     console.log();
     console.log(chalk.bold.cyan('╔══════════════════════════════════════════════════════════════╗'));
-    console.log(chalk.bold.cyan('║') + chalk.bold.white('                    BITV Audit Tool                          ') + chalk.bold.cyan('║'));
-    console.log(chalk.bold.cyan('║') + chalk.gray('                Barrierefreiheits-Prüfung                    ') + chalk.bold.cyan('║'));
+    console.log(
+      chalk.bold.cyan('║') +
+        chalk.bold.white('                    BITV Audit Tool                          ') +
+        chalk.bold.cyan('║')
+    );
+    console.log(
+      chalk.bold.cyan('║') +
+        chalk.gray('                Barrierefreiheits-Prüfung                    ') +
+        chalk.bold.cyan('║')
+    );
     console.log(chalk.bold.cyan('╚══════════════════════════════════════════════════════════════╝'));
     console.log();
   }
@@ -97,24 +105,24 @@ class Logger {
     console.log();
     console.log(chalk.bold.white('📊 Audit Zusammenfassung:'));
     console.log(chalk.gray('─'.repeat(50)));
-    
+
     if (stats.totalChecks) {
       console.log(`${chalk.blue('Geprüfte Kriterien:')} ${chalk.white(stats.totalChecks)}`);
     }
-    
+
     if (stats.totalErrors !== undefined) {
       const errorColor = stats.totalErrors === 0 ? chalk.green : stats.totalErrors < 5 ? chalk.yellow : chalk.red;
       console.log(`${chalk.blue('Gefundene Probleme:')} ${errorColor(stats.totalErrors)}`);
     }
-    
+
     if (stats.duration) {
       console.log(`${chalk.blue('Dauer:')} ${chalk.white(stats.duration)}`);
     }
-    
+
     if (stats.reportPath) {
       console.log(`${chalk.blue('Report:')} ${chalk.green(stats.reportPath)}`);
     }
-    
+
     console.log(chalk.gray('─'.repeat(50)));
     console.log();
   }
@@ -129,12 +137,12 @@ class Logger {
     const percentage = Math.round((current / total) * 100);
     const filled = Math.round((current / total) * 30);
     const empty = 30 - filled;
-    
+
     const bar = chalk.green('█'.repeat(filled)) + chalk.gray('░'.repeat(empty));
     const progress = `[${bar}] ${percentage}% ${label}`;
-    
+
     process.stdout.write('\r' + progress);
-    
+
     if (current === total) {
       process.stdout.write('\n');
     }
@@ -144,4 +152,4 @@ class Logger {
 // Create a singleton instance
 const logger = new Logger();
 
-export default logger; 
+export default logger;

@@ -41,19 +41,14 @@ class PdfReportGenerator {
     this.doc.addPage();
     this.doc.fontSize(16).text('Summary', 50, 50);
 
-    const totalErrors = Object.values(this.results).reduce(
-      (sum, result) => sum + (result.errors?.length || 0),
-      0
-    );
+    const totalErrors = Object.values(this.results).reduce((sum, result) => sum + (result.errors?.length || 0), 0);
 
-    this.doc
-      .fontSize(12)
-      .text(`Total Issues Found: ${totalErrors}`, 50, 80);
+    this.doc.fontSize(12).text(`Total Issues Found: ${totalErrors}`, 50, 80);
 
     // Add severity breakdown
     const severityCount = {};
-    Object.values(this.results).forEach(result => {
-      result.errors?.forEach(error => {
+    Object.values(this.results).forEach((result) => {
+      result.errors?.forEach((error) => {
         const severity = error.severity || 'UNKNOWN';
         severityCount[severity] = (severityCount[severity] || 0) + 1;
       });
@@ -73,25 +68,21 @@ class PdfReportGenerator {
     let yPosition = 80;
     Object.entries(this.results).forEach(([checkId, result]) => {
       if (result.errors?.length > 0) {
-        this.doc
-          .fontSize(14)
-          .text(`Check ${checkId}`, 50, yPosition);
-        
+        this.doc.fontSize(14).text(`Check ${checkId}`, 50, yPosition);
+
         yPosition += 25;
-        
-        result.errors.forEach(error => {
-          this.doc
-            .fontSize(10)
-            .text(`• ${error.error || error.message || 'Unknown error'}`, 60, yPosition);
-          
+
+        result.errors.forEach((error) => {
+          this.doc.fontSize(10).text(`• ${error.error || error.message || 'Unknown error'}`, 60, yPosition);
+
           yPosition += 15;
-          
+
           if (yPosition > 700) {
             this.doc.addPage();
             yPosition = 50;
           }
         });
-        
+
         yPosition += 10;
       }
     });
@@ -107,12 +98,10 @@ class PdfReportGenerator {
 
     let yPosition = 80;
     Object.entries(this.extractedColors).forEach(([element, colors]) => {
-      this.doc
-        .fontSize(12)
-        .text(`${element}:`, 50, yPosition);
-      
+      this.doc.fontSize(12).text(`${element}:`, 50, yPosition);
+
       yPosition += 20;
-      
+
       if (colors.background && colors.foreground) {
         const contrast = getContrastRatio(colors.foreground, colors.background);
         this.doc
@@ -120,10 +109,10 @@ class PdfReportGenerator {
           .text(`Foreground: ${colors.foreground}`, 60, yPosition)
           .text(`Background: ${colors.background}`, 60, yPosition + 15)
           .text(`Contrast Ratio: ${contrast.toFixed(2)}`, 60, yPosition + 30);
-        
+
         yPosition += 60;
       }
-      
+
       if (yPosition > 700) {
         this.doc.addPage();
         yPosition = 50;

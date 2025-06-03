@@ -9,7 +9,7 @@ import { promises as fs } from 'node:fs';
  * @returns {number} Relative luminance value
  */
 function getLuminance(r, g, b) {
-  const [rs, gs, bs] = [r, g, b].map(c => {
+  const [rs, gs, bs] = [r, g, b].map((c) => {
     c = c / 255;
     return c <= 0.03928 ? c / 12.92 : ((c + 0.055) / 1.055) ** 2.4;
   });
@@ -53,9 +53,7 @@ export async function cleanupScreenshots() {
   try {
     const screenshotsDir = path.join(process.cwd(), 'screenshots');
     const files = await fs.readdir(screenshotsDir);
-    await Promise.all(
-      files.map(file => fs.unlink(path.join(screenshotsDir, file)))
-    );
+    await Promise.all(files.map((file) => fs.unlink(path.join(screenshotsDir, file))));
   } catch (error) {
     console.warn('Error cleaning up screenshots:', error);
   }
@@ -63,5 +61,5 @@ export async function cleanupScreenshots() {
 
 export default {
   getContrastRatio,
-  cleanupScreenshots
+  cleanupScreenshots,
 };
