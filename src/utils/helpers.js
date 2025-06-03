@@ -1,3 +1,6 @@
+import path from 'node:path';
+import { promises as fs } from 'node:fs';
+
 /**
  * Calculate relative luminance of a color
  * @param {number} r Red component (0-255)
@@ -57,10 +60,6 @@ export async function cleanupScreenshots() {
     console.warn('Error cleaning up screenshots:', error);
   }
 }
-
-// Add imports at the top
-import path from 'node:path';
-import { promises as fs } from 'node:fs';
 
 export default {
   getContrastRatio,

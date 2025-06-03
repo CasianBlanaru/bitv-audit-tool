@@ -1,4 +1,7 @@
-const { extractColors } = require('./checks/colorExtractor');
+import { extractColors } from './checks/colorExtractor.js';
+import { BITV_CHECKS } from './checks/bitvChecks.js';
+import PdfReportGenerator from './report/PdfReportGenerator.js';
+import puppeteer from 'puppeteer';
 
 async function runAccessibilityCheck(url) {
   try {
@@ -13,7 +16,7 @@ async function runAccessibilityCheck(url) {
     // Run the checks
     const results = {};
     for (const [checkId, check] of Object.entries(BITV_CHECKS)) {
-      results[checkId] = await runCheck(page, check);
+      results[checkId] = await check.check(page);
     }
 
     // Generate report with extracted colors
@@ -27,3 +30,5 @@ async function runAccessibilityCheck(url) {
     throw error;
   }
 }
+
+export { runAccessibilityCheck };

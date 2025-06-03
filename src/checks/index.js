@@ -1,7 +1,5 @@
-const bitvChecks = require('./bitvChecks');
-const bitvCheckCategories = require('./bitvCategories');
+import { BITV_CHECKS } from './bitvChecks.js';
+import bitvCheckCategories from './bitvCategories.js';
 
-module.exports = {
-  BITV_CHECKS: bitvChecks,
-  BITV_CHECK_CATEGORIES: bitvCheckCategories,
-};
+export { BITV_CHECKS };
+export const BITV_CHECK_CATEGORIES = bitvCheckCategories;

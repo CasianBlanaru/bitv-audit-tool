@@ -2,7 +2,7 @@
  * BITV categories and their assignments
  */
 
-const { BITV_CATEGORIES } = require('../constants');
+import { BITV_CATEGORIES } from '../constants.js';
 
 const bitvCheckCategories = {
   '1.1.1a': BITV_CATEGORIES.WAHRNEHMBAR,
@@ -50,4 +50,4 @@ const bitvCheckCategories = {
   '3.2.4': BITV_CATEGORIES.VERSTAENDLICH,
 };
 
-module.exports = bitvCheckCategories;
+export default bitvCheckCategories;

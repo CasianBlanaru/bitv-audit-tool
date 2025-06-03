@@ -1,12 +1,13 @@
-const puppeteer = require('puppeteer');
-const PdfReportGenerator = require('./report/PdfReportGenerator');
-const { BITV_CHECKS } = require('./checks/bitvChecks');
-const { extractColors } = require('./checks/colorExtractor');
-const fs = require('node:fs').promises;
-const path = require('node:path');
+import puppeteer from 'puppeteer';
+import PdfReportGenerator from './report/PdfReportGenerator.js';
+import { BITV_CHECKS } from './checks/bitvChecks.js';
+import { extractColors } from './checks/colorExtractor.js';
+import { promises as fs } from 'node:fs';
+import path from 'node:path';
+import { config } from 'dotenv';
 
 // Load environment variables
-require('dotenv').config();
+config();
 
 async function runAccessibilityTests(url) {
   const browser = await puppeteer.launch({ headless: 'new' });
@@ -53,12 +54,13 @@ async function generateReport(url, outputDir = './reports') {
   }
 }
 
-module.exports = {
+export {
   runAccessibilityTests,
   generateReport,
 };
 
-if (require.main === module) {
+// Check if this module is being run directly
+if (import.meta.url === `file://${process.argv[1]}`) {
   const url = process.env.TARGET_URL || 'http://localhost:3000';
 
   if (!url) {

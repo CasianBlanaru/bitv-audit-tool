@@ -1,708 +1,135 @@
-// src/checks/bitvChecks.js
-const { SEVERITY_LEVELS, BITV_CATEGORIES } = require('../constants');
-const fs = require('node:fs').promises;
-const path = require('node:path');
-const { getContrastRatio } = require('../utils/helpers');
+import { SEVERITY_LEVELS, BITV_CATEGORIES } from '../constants.js';
+import { promises as fs, createWriteStream } from 'node:fs';
+import path from 'node:path';
+import { getContrastRatio } from '../utils/helpers.js';
+import PDFDocument from 'pdfkit';
 
-const BITV_CHECKS = {
-  '1.1.1': {
-    description: 'Nicht-textueller Inhalt (Alternativtexte)',
-    severity: SEVERITY_LEVELS.HIGH,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const images = document.querySelectorAll('img');
-        for (const img of images) {
-          const alt = img.getAttribute('alt') || '';
-          const isDecorative = img.hasAttribute('role') && img.getAttribute('role') === 'presentation';
-          const isSuspicious =
-            alt.match(/^(Bild|Grafik|img\d+\.\w+)$/i) || (!isDecorative && (alt.length < 5 || alt.length > 150));
-          if (!isDecorative && alt === '') {
-            errors.push({
-              src: img.src,
-              selector: img.getAttribute('id') ? `#${img.id}` : `img[src="${img.src.replace(/"/g, '')}"]`,
-              error: 'Fehlender Alternativtext',
-            });
-          } else if (isSuspicious && !isDecorative) {
-            errors.push({
-              src: img.src,
-              selector: img.getAttribute('id') ? `#${img.id}` : `img[src="${img.src.replace(/"/g, '')}"]`,
-              error: `Verdächtiger Alternativtext: "${alt}"`,
-            });
-          }
-        }
-        return errors;
+class PdfReportGenerator {
+  constructor(url, results, extractedColors) {
+    this.url = url;
+    this.results = results;
+    this.extractedColors = extractedColors;
+    this.doc = new PDFDocument();
+  }
+
+  async generate(filename) {
+    // Create output stream
+    this.doc.pipe(createWriteStream(filename));
+
+    // Generate report content
+    this.addHeader();
+    this.addSummary();
+    this.addResults();
+    this.addColorAnalysis();
+
+    // Finalize the PDF
+    this.doc.end();
+
+    return filename;
+  }
+
+  addHeader() {
+    this.doc
+      .fontSize(20)
+      .text('BITV Accessibility Audit Report', 50, 50)
+      .fontSize(12)
+      .text(`URL: ${this.url}`, 50, 80)
+      .text(`Generated: ${new Date().toLocaleString()}`, 50, 100);
+  }
+
+  addSummary() {
+    this.doc.addPage();
+    this.doc.fontSize(16).text('Summary', 50, 50);
+
+    const totalErrors = Object.values(this.results).reduce(
+      (sum, result) => sum + (result.errors?.length || 0),
+      0
+    );
+
+    this.doc
+      .fontSize(12)
+      .text(`Total Issues Found: ${totalErrors}`, 50, 80);
+
+    // Add severity breakdown
+    const severityCount = {};
+    Object.values(this.results).forEach(result => {
+      result.errors?.forEach(error => {
+        const severity = error.severity || 'UNKNOWN';
+        severityCount[severity] = (severityCount[severity] || 0) + 1;
       });
+    });
 
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
+    let yPosition = 110;
+    Object.entries(severityCount).forEach(([severity, count]) => {
+      this.doc.text(`${severity}: ${count}`, 50, yPosition);
+      yPosition += 20;
+    });
+  }
 
-          if (boundingBox) {
-            const filename = `error_1.1.1_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
+  addResults() {
+    this.doc.addPage();
+    this.doc.fontSize(16).text('Detailed Results', 50, 50);
+
+    let yPosition = 80;
+    Object.entries(this.results).forEach(([checkId, result]) => {
+      if (result.errors?.length > 0) {
+        this.doc
+          .fontSize(14)
+          .text(`Check ${checkId}`, 50, yPosition);
+        
+        yPosition += 25;
+        
+        result.errors.forEach(error => {
+          this.doc
+            .fontSize(10)
+            .text(`• ${error.error || error.message || 'Unknown error'}`, 60, yPosition);
+          
+          yPosition += 15;
+          
+          if (yPosition > 700) {
+            this.doc.addPage();
+            yPosition = 50;
           }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
+        });
+        
+        yPosition += 10;
       }
-      return results;
-    },
-  },
-  // Die folgenden Prüfungen (1.2.3, 1.2.5, 1.3.1, etc.) müssen ähnlich angepasst werden
-  '1.2.3': {
-    description: 'Audiodeskription oder Medienalternative',
-    severity: SEVERITY_LEVELS.MEDIUM,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      return await page.evaluate(async () => {
-        const errors = [];
-        const videos = document.querySelectorAll('video');
-        for (const video of videos) {
-          const tracks = video.querySelectorAll('track[kind="descriptions"], track[kind="captions"]');
-          if (!tracks.length) {
-            errors.push({
-              src: video.currentSrc,
-              selector: video.getAttribute('id') ? `#${video.id}` : 'video',
-              error: 'Keine Audiodeskription oder Untertitel gefunden',
-            });
-          }
-        }
-        return errors;
-      });
-    },
-  },
-  '1.2.5': {
-    description: 'Audiodeskription (vorgefertigt)',
-    severity: SEVERITY_LEVELS.MEDIUM,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      return await page.evaluate(async () => {
-        const errors = [];
-        const videos = document.querySelectorAll('video');
-        for (const video of videos) {
-          const tracks = video.querySelectorAll('track[kind="descriptions"]');
-          const trackUrls = Array.from(tracks).map((t) => t.src);
-          const validTracks = [];
-          for (const url of trackUrls) {
-            try {
-              const response = await fetch(url);
-              if (response.ok) validTracks.push(url);
-            } catch {
-              // Ignoriere Fehler
-            }
-          }
-          if (!validTracks.length && tracks.length > 0) {
-            errors.push({
-              src: video.currentSrc,
-              selector: video.getAttribute('id') ? `#${video.id}` : 'video',
-              error: 'Ungültige oder fehlende Audiodeskription',
-            });
-          }
-        }
-        return errors;
-      });
-    },
-  },
-  '1.3.1': {
-    description: 'Info und Beziehungen',
-    severity: SEVERITY_LEVELS.CRITICAL,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const formElements = document.querySelectorAll('input, select, textarea');
-        for (const element of formElements) {
-          if (element.type === 'hidden') continue;
-          const hasLabel =
-            element.labels?.length > 0 || element.getAttribute('aria-label') || element.getAttribute('aria-labelledby');
-          if (!hasLabel) {
-            errors.push({
-              element: element.outerHTML.slice(0, 100),
-              selector: element.getAttribute('id') ? `#${element.id}` : element.tagName.toLowerCase(),
-              error: 'Keine programmatisch ermittelbare Beschriftung',
-            });
-          }
-        }
-        const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        let lastLevel = 0;
-        for (const heading of headings) {
-          const level = Number.parseInt(heading.tagName.slice(1));
-          if (lastLevel && level > lastLevel + 1) {
-            errors.push({
-              element: heading.outerHTML.slice(0, 100),
-              selector: heading.getAttribute('id') ? `#${heading.id}` : heading.tagName.toLowerCase(),
-              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`,
-            });
-          }
-          lastLevel = level;
-        }
-        return errors;
-      });
+    });
+  }
 
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
+  addColorAnalysis() {
+    if (!this.extractedColors || Object.keys(this.extractedColors).length === 0) {
+      return;
+    }
 
-          if (boundingBox) {
-            const filename = `error_1.3.1_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
+    this.doc.addPage();
+    this.doc.fontSize(16).text('Color Analysis', 50, 50);
+
+    let yPosition = 80;
+    Object.entries(this.extractedColors).forEach(([element, colors]) => {
+      this.doc
+        .fontSize(12)
+        .text(`${element}:`, 50, yPosition);
+      
+      yPosition += 20;
+      
+      if (colors.background && colors.foreground) {
+        const contrast = getContrastRatio(colors.foreground, colors.background);
+        this.doc
+          .fontSize(10)
+          .text(`Foreground: ${colors.foreground}`, 60, yPosition)
+          .text(`Background: ${colors.background}`, 60, yPosition + 15)
+          .text(`Contrast Ratio: ${contrast.toFixed(2)}`, 60, yPosition + 30);
+        
+        yPosition += 60;
       }
-      return results;
-    },
-  },
-  '1.3.1a': {
-    description: 'Info und Beziehungen (Überschriftenstruktur)',
-    severity: SEVERITY_LEVELS.CRITICAL,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const headings = document.querySelectorAll('h1, h2, h3, h4, h5, h6');
-        let lastLevel = 0;
-        for (const heading of headings) {
-          const level = Number.parseInt(heading.tagName.slice(1));
-          if (lastLevel && level > lastLevel + 1) {
-            errors.push({
-              element: heading.outerHTML.slice(0, 100),
-              selector: heading.getAttribute('id') ? `#${heading.id}` : heading.tagName.toLowerCase(),
-              error: `Übersprungene Überschriftenebene: H${lastLevel} zu H${level}`,
-            });
-          }
-          lastLevel = level;
-        }
-        return errors;
-      });
-
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
-
-          if (boundingBox) {
-            const filename = `error_1.3.1a_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
+      
+      if (yPosition > 700) {
+        this.doc.addPage();
+        yPosition = 50;
       }
-      return results;
-    },
-  },
-  '1.4.3': {
-    description: 'Kontrast (Minimum)',
-    severity: SEVERITY_LEVELS.HIGH,
-    category: BITV_CATEGORIES.WAHRNEHMBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const colors = await require('./colorExtractor').extractColors(page);
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const elements = document.querySelectorAll('p, span, a, div');
-        for (const el of elements) {
-          const style = window.getComputedStyle(el);
-          const fgColor = style.color;
-          const bgColor = style.backgroundColor;
-          const text = el.textContent.trim().slice(0, 50);
-          if (fgColor && bgColor && text && bgColor !== 'rgba(0, 0, 0, 0)') {
-            errors.push({
-              element: el.outerHTML.slice(0, 100),
-              selector: el.getAttribute('id') ? `#${el.id}` : el.tagName.toLowerCase(),
-              text,
-              fgColor,
-              bgColor,
-            });
-          }
-        }
-        return errors;
-      });
+    });
+  }
+}
 
-      const errors = [];
-      for (const item of results) {
-        try {
-          const contrastRatio = getContrastRatio(item.fgColor, item.bgColor);
-          const fontSize = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            return el ? Number.parseFloat(window.getComputedStyle(el).fontSize) : 16;
-          }, item.selector);
-          const isLarge =
-            fontSize >= 18 ||
-            (fontSize >= 14 &&
-              (await page.evaluate((sel) => {
-                const el = document.querySelector(sel);
-                return el ? Number.parseFloat(window.getComputedStyle(el).fontWeight) >= 700 : false;
-              }, item.selector)));
-          const required = isLarge ? 3 : 4.5;
-          if (contrastRatio < required) {
-            errors.push({
-              element: item.element,
-              text: item.text,
-              selector: item.selector,
-              error: `Kontrast zu niedrig: ${contrastRatio.toFixed(2)} < ${required}`,
-              fgColor: item.fgColor,
-              bgColor: item.bgColor,
-            });
-          }
-        } catch (e) {
-          console.warn(`Kontrastberechnung für ${item.selector} fehlgeschlagen: ${e.message}`);
-        }
-      }
-
-      for (const error of errors) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
-
-          if (boundingBox) {
-            const filename = `error_1.4.3_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
-      }
-      return errors;
-    },
-  },
-  '2.2.2': {
-    description: 'Pausieren, Stoppen, Ausblenden',
-    severity: SEVERITY_LEVELS.CRITICAL,
-    category: BITV_CATEGORIES.BEDIENBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const movingElements = document.querySelectorAll('[style*="animation"], [style*="transition"], marquee');
-        for (const element of movingElements) {
-          const hasPause =
-            element.querySelector('button[aria-label*="pause"], button[aria-label*="stop"]') ||
-            element.hasAttribute('aria-controls');
-          if (!hasPause) {
-            errors.push({
-              element: element.outerHTML.slice(0, 100),
-              selector: element.getAttribute('id') ? `#${element.id}` : element.tagName.toLowerCase(),
-              error: 'Kein Mechanismus zum Pausieren oder Stoppen',
-            });
-          }
-        }
-        return errors;
-      });
-
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
-
-          if (boundingBox) {
-            const filename = `error_2.2.2_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
-      }
-      return results;
-    },
-  },
-  '2.4.4': {
-    description: 'Linkzweck (im Kontext)',
-    severity: SEVERITY_LEVELS.HIGH,
-    category: BITV_CATEGORIES.BEDIENBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const links = document.querySelectorAll('a[href]');
-        for (const link of links) {
-          const text = link.textContent.trim();
-          const ariaLabel = link.getAttribute('aria-label') || '';
-          const parentText = link.parentElement?.textContent.trim() || '';
-          const isGeneric = /^(hier klicken|mehr|click here)$/i.test(text);
-          const hasContext = parentText.length > text.length && parentText !== text;
-          if (isGeneric && !ariaLabel && !hasContext) {
-            errors.push({
-              text,
-              href: link.href,
-              selector: link.getAttribute('id') ? `#${link.id}` : `a[href="${link.href.replace(/"/g, '')}"]`,
-              error: 'Generischer Link ohne klaren Kontext',
-            });
-          }
-        }
-        return errors;
-      });
-
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
-
-          if (boundingBox) {
-            const filename = `error_2.4.4_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
-      }
-      return results;
-    },
-  },
-  '2.4.5': {
-    description: 'Mehrere Wege',
-    severity: SEVERITY_LEVELS.MEDIUM,
-    category: BITV_CATEGORIES.BEDIENBAR,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const navigationMethods = [];
-        if (document.querySelector('nav')) navigationMethods.push('Navigationsleiste');
-        if (document.querySelector('form[role="search"], input[type="search"]')) navigationMethods.push('Suche');
-        if (document.querySelector('a[href$="sitemap"], a[href$="site-map"]')) navigationMethods.push('Sitemap');
-        if (navigationMethods.length < 2) {
-          return [
-            {
-              error: `Weniger als zwei Navigationswege gefunden: ${navigationMethods.join(', ') || 'keine'}`,
-            },
-          ];
-        }
-        return [];
-      });
-      return results;
-    },
-  },
-  '3.1.3': {
-    description: 'Ungewöhnliche Wörter',
-    severity: SEVERITY_LEVELS.LOW,
-    category: BITV_CATEGORIES.VERSTAENDLICH,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const hasGlossary =
-          document.querySelector('a[href*="glossary"], a[href*="glossar"]') ||
-          document.querySelector('[id*="glossary"], [id*="glossar"]');
-        if (!hasGlossary) {
-          return [{ error: 'Kein Glossar oder Begriffserklärungen gefunden' }];
-        }
-        return [];
-      });
-      return results;
-    },
-  },
-  '3.2.4': {
-    description: 'Konsistente Bezeichnung',
-    severity: SEVERITY_LEVELS.HIGH,
-    category: BITV_CATEGORIES.VERSTAENDLICH,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const links = document.querySelectorAll('a[href]');
-        const linkMap = {};
-        for (const link of links) {
-          const text = link.textContent.trim();
-          if (text) {
-            if (!linkMap[text]) linkMap[text] = [];
-            linkMap[text].push(link.href);
-          }
-        }
-        for (const [text, hrefs] of Object.entries(linkMap)) {
-          const uniqueHrefs = [...new Set(hrefs)];
-          if (uniqueHrefs.length > 1) {
-            errors.push({
-              text,
-              hrefs: uniqueHrefs,
-              error: `Inkonsistente Bezeichnung: "${text}" führt zu mehreren Zielen`,
-            });
-          }
-        }
-        return errors;
-      });
-      return results;
-    },
-  },
-  '4.1.1': {
-    description: 'Parsen',
-    severity: SEVERITY_LEVELS.HIGH,
-    category: BITV_CATEGORIES.ROBUST,
-    check: async (page) => {
-      await fs.mkdir('screenshots', { recursive: true });
-      const results = await page.evaluate(() => {
-        const errors = [];
-        const elements = document.querySelectorAll('*');
-        for (const element of elements) {
-          const id = element.getAttribute('id');
-          if (id && document.querySelectorAll(`[id="${id}"]`).length > 1) {
-            errors.push({
-              element: element.tagName.toLowerCase(),
-              id,
-              error: `Dupliziertes ID-Attribut: ${id}`,
-            });
-          }
-        }
-        const buttons = document.querySelectorAll('button');
-        for (const button of buttons) {
-          const invalidChildren = button.querySelectorAll('div, p, ul, ol');
-          if (invalidChildren.length) {
-            errors.push({
-              element: button.outerHTML.slice(0, 100),
-              selector: button.getAttribute('id') ? `#${button.id}` : 'button',
-              error: 'Ungültige Kindelemente in Button',
-            });
-          }
-        }
-        return errors;
-      });
-
-      for (const error of results) {
-        try {
-          const boundingBox = await page.evaluate((sel) => {
-            const el = document.querySelector(sel);
-            if (!el) {
-              console.log(`Element mit Selector ${sel} nicht gefunden.`);
-              return null;
-            }
-            const style = window.getComputedStyle(el);
-            if (style.display === 'none' || style.visibility === 'hidden') {
-              console.log(`Element mit Selector ${sel} ist nicht sichtbar (display: none oder visibility: hidden).`);
-              return null;
-            }
-            const rect = el.getBoundingClientRect();
-            if (
-              !rect ||
-              rect.width <= 0 ||
-              rect.height <= 0 ||
-              Number.isNaN(rect.x) ||
-              Number.isNaN(rect.y) ||
-              Number.isNaN(rect.width) ||
-              Number.isNaN(rect.height)
-            ) {
-              console.log(`Invalid BoundingBox for ${sel}:`, rect);
-              return null;
-            }
-            return { x: rect.x, y: rect.y, width: rect.width, height: rect.height };
-          }, error.selector);
-
-          if (boundingBox) {
-            const filename = `error_4.1.1_${Date.now()}_${Math.random().toString(36).slice(2, 8)}.png`;
-            await page.screenshot({ path: `screenshots/${filename}`, clip: boundingBox });
-            error.screenshot = `screenshots/${filename}`;
-          } else {
-            console.log(
-              `Kein Screenshot für ${error.selector} erstellt: BoundingBox ungültig oder Element nicht sichtbar.`
-            );
-          }
-        } catch (e) {
-          console.warn(`Screenshot für ${error.selector} fehlgeschlagen: ${e.message}`);
-        }
-      }
-      return results;
-    },
-  },
-};
-
-const BITV_CHECK_CATEGORIES = {
-  '1.1.1': BITV_CATEGORIES.WAHRNEHMBAR,
-  '1.2.3': BITV_CATEGORIES.WAHRNEHMBAR,
-  '1.2.5': BITV_CATEGORIES.WAHRNEHMBAR,
-  '1.3.1': BITV_CATEGORIES.WAHRNEHMBAR,
-  '1.3.1a': BITV_CATEGORIES.WAHRNEHMBAR,
-  '1.4.3': BITV_CATEGORIES.WAHRNEHMBAR,
-  '2.2.2': BITV_CATEGORIES.BEDIENBAR,
-  '2.4.4': BITV_CATEGORIES.BEDIENBAR,
-  '2.4.5': BITV_CATEGORIES.BEDIENBAR,
-  '3.1.3': BITV_CATEGORIES.VERSTAENDLICH,
-  '3.2.4': BITV_CATEGORIES.VERSTAENDLICH,
-  '4.1.1': BITV_CATEGORIES.ROBUST,
-};
-
-module.exports = {
-  BITV_CHECKS,
-  BITV_CHECK_CATEGORIES,
-};
+export default PdfReportGenerator;
